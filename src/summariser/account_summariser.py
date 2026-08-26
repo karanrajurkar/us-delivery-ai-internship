@@ -82,25 +82,103 @@ class TAMAccountSummariser:
         # Deterministic Risk & Churn Quote Extraction
         risks = self._extract_verbatim_risk_quotes(tickets_90d)
 
+        # Step 2: 4-Tier Fallback Chain (Cloud Gemini -> Cloud OpenAI -> Local Ollama -> Rule Engine)
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
-        use_local_llm = os.getenv("USE_LOCAL_LLM", "false").lower() in ("true", "1", "yes")
         has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
         has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
 
-        if use_local_llm:
+        # Tier 1: Cloud Gemini LLM
+        if has_valid_gemini:
             try:
-                return self._summarise_with_local_llm(account, tickets_90d, risks)
+                return self._summarise_with_gemini(account, tickets_90d, risks)
             except Exception as e:
-                print(f"[TAMSummariser] Local LLM call failed: {e}. Falling back to cloud LLM / rule engine.")
+                print(f"[TAMSummariser] Gemini API failed ({_redact_key(e)}). Attempting OpenAI / Ollama failover...")
 
-        if has_valid_gemini or has_valid_openai:
+        # Tier 2: Cloud OpenAI LLM
+        if has_valid_openai:
             try:
-                return self._summarise_with_llm(account, tickets_90d, risks)
+                return self._summarise_with_openai(account, tickets_90d, risks)
             except Exception as e:
-                print(f"[TAMSummariser] LLM call failed: {_redact_key(e)}. Falling back to deterministic rule engine.")
+                print(f"[TAMSummariser] OpenAI API failed ({_redact_key(e)}). Attempting Local Ollama failover...")
 
+        # Tier 3: Local Ollama LLM
+        try:
+            return self._summarise_with_local_llm(account, tickets_90d, risks)
+        except Exception:
+            pass
+
+        # Tier 4: Deterministic Rule Engine
         return self._summarise_rule_engine(account, tickets_90d, risks)
+
+    def _summarise_with_gemini(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
+        import requests
+        gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
+        model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
+        headers = {"Content-Type": "application/json"}
+        t_summary = f"Total 90d Tickets: {len(tickets)}.\n" + "\n".join([f"- [{t.get('ticket_id')}] ({t.get('product_area')}): {t.get('subject')}" for t in tickets[:10]])
+        prompt = f"Account Metadata:\nID: {account.get('account_id')}\nCompany: {account.get('company_name')}\nTier: {account.get('tier')}\nMRR: ${account.get('mrr'):,}\nHealth: {account.get('health_score')}\n\nTicket History:\n{t_summary}"
+        payload = {
+            "contents": [{"parts": [{"text": f"{SUMMARISER_SYSTEM_PROMPT}\n\n{prompt}"}]}],
+            "generationConfig": {"temperature": 0.0, "seed": 42, "responseMimeType": "application/json"}
+        }
+        res = None
+        for attempt in range(2):
+            _throttle_gemini_summ_api()
+            res = requests.post(url, headers=headers, json=payload, timeout=30)
+            if res.status_code in (400, 401, 403):
+                break
+            if res.status_code == 429:
+                time.sleep(2)
+                continue
+            break
+        res.raise_for_status()
+        text_out = res.json()['candidates'][0]['content']['parts'][0]['text']
+        parsed = json.loads(text_out)
+        if risks:
+            parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
+        parsed["execution_mode"] = "LLM_GEMINI"
+        return AccountBrief(
+            account_id=account.get("account_id"),
+            company_name=account.get("company_name"),
+            tier=account.get("tier"),
+            mrr=account.get("mrr"),
+            health_score=account.get("health_score"),
+            **parsed
+        )
+
+    def _summarise_with_openai(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
+        import requests
+        openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+        t_summary = f"Total 90d Tickets: {len(tickets)}.\n" + "\n".join([f"- [{t.get('ticket_id')}] ({t.get('product_area')}): {t.get('subject')}" for t in tickets[:10]])
+        prompt = f"Account Metadata:\nID: {account.get('account_id')}\nCompany: {account.get('company_name')}\nTier: {account.get('tier')}\nMRR: ${account.get('mrr'):,}\nHealth: {account.get('health_score')}\n\nTicket History:\n{t_summary}"
+        url = "https://api.openai.com/v1/chat/completions"
+        headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
+        payload = {
+            "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            "messages": [
+                {"role": "system", "content": SUMMARISER_SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            "response_format": {"type": "json_object"},
+            "temperature": 0.0
+        }
+        res = requests.post(url, headers=headers, json=payload, timeout=30)
+        res.raise_for_status()
+        text_out = res.json()['choices'][0]['message']['content']
+        parsed = json.loads(text_out)
+        if risks:
+            parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
+        parsed["execution_mode"] = "LLM_OPENAI"
+        return AccountBrief(
+            account_id=account.get("account_id"),
+            company_name=account.get("company_name"),
+            tier=account.get("tier"),
+            mrr=account.get("mrr"),
+            health_score=account.get("health_score"),
+            **parsed
+        )
 
     def _summarise_with_local_llm(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
         import requests
@@ -177,95 +255,6 @@ Return valid JSON only matching the schema.
                         ))
                         break # avoid duplicate flags for same sentence
         return risks
-
-    def _summarise_with_llm(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
-        import requests
-        gemini_key = os.getenv("GEMINI_API_KEY")
-        openai_key = os.getenv("OPENAI_API_KEY")
-
-        t_summary = f"Total 90d Tickets: {len(tickets)}.\n"
-        for t in tickets[:10]:
-            t_summary += f"- [{t.get('ticket_id')}] ({t.get('product_area')}, {t.get('status')}): {t.get('subject')}\n  Body: {t.get('body')}\n"
-
-        prompt = f"""Account Metadata:
-ID: {account.get('account_id')}
-Company: {account.get('company_name')}
-Tier: {account.get('tier')}
-MRR: ${account.get('mrr'):,}
-Health Score: {account.get('health_score')}
-Contract End: {account.get('contract_end_date')}
-
-Recent 90-Day Ticket History:
-{t_summary}
-"""
-        if gemini_key:
-            model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
-            headers = {"Content-Type": "application/json"}
-            payload = {
-                "contents": [{"parts": [{"text": f"{SUMMARISER_SYSTEM_PROMPT}\n\n{prompt}"}]}],
-                "generationConfig": {"temperature": 0.0, "seed": 42, "responseMimeType": "application/json"}
-            }
-            res = None
-            for attempt in range(2):
-                _throttle_gemini_summ_api()
-                res = requests.post(url, headers=headers, json=payload, timeout=30)
-                if res.status_code in (400, 401, 403):
-                    # Non-retryable key/auth error - break immediately
-                    break
-                if res.status_code == 429:
-                    print(f"[TAMSummariser] Rate limit 429 encountered. Retrying in 2s (Attempt {attempt+1}/2)...")
-                    time.sleep(2)
-                    continue
-                break
-            res.raise_for_status()
-            res_json = res.json()
-            text_out = res_json['candidates'][0]['content']['parts'][0]['text']
-            parsed = json.loads(text_out)
-            
-            # Ensure risks retain verbatim quotes
-            if risks:
-                parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
-                
-            parsed["execution_mode"] = "LLM_GEMINI"
-            return AccountBrief(
-                account_id=account.get("account_id"),
-                company_name=account.get("company_name"),
-                tier=account.get("tier"),
-                mrr=account.get("mrr", 0),
-                health_score=account.get("health_score", "Unknown"),
-                **parsed
-            )
-        elif openai_key:
-            url = "https://api.openai.com/v1/chat/completions"
-            headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
-            payload = {
-                "model": "gpt-4o-mini",
-                "messages": [
-                    {"role": "system", "content": SUMMARISER_SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt}
-                ],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.0,
-                "seed": 42
-            }
-            res = requests.post(url, headers=headers, json=payload, timeout=10)
-            res.raise_for_status()
-            text_out = res.json()['choices'][0]['message']['content']
-            parsed = json.loads(text_out)
-            if risks:
-                parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
-            parsed["execution_mode"] = "LLM_OPENAI"
-            return AccountBrief(
-                account_id=account.get("account_id"),
-                company_name=account.get("company_name"),
-                tier=account.get("tier"),
-                mrr=account.get("mrr", 0),
-                health_score=account.get("health_score", "Unknown"),
-                **parsed
-            )
-
-        return self._summarise_rule_engine(account, tickets, risks)
 
     def _summarise_rule_engine(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
         name = account.get("company_name", "Account")

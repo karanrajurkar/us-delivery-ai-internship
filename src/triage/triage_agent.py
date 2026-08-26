@@ -83,26 +83,87 @@ class TicketTriageAgent:
         if retrieved_docs and retrieved_docs[0][1] > 0.05:
             matched_kb, kb_score, kb_context = retrieved_docs[0]
 
-        # Step 2: LLM API or Local Rule Engine Classification
+        # Step 2: 4-Tier Fallback Chain (Cloud Gemini -> Cloud OpenAI -> Local Ollama -> Rule Engine)
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
-        use_local_llm = os.getenv("USE_LOCAL_LLM", "false").lower() in ("true", "1", "yes")
         has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
         has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
 
-        if use_local_llm:
+        # Tier 1: Cloud Gemini LLM
+        if has_valid_gemini:
             try:
-                return self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
+                return self._triage_with_gemini(subject, body, matched_kb, kb_score, kb_context)
             except Exception as e:
-                print(f"[TriageAgent] Local LLM call failed: {e}. Falling back to cloud LLM / rule engine.")
+                print(f"[TriageAgent] Gemini API failed ({_redact_key(e)}). Attempting OpenAI / Ollama failover...")
 
-        if has_valid_gemini or has_valid_openai:
+        # Tier 2: Cloud OpenAI LLM
+        if has_valid_openai:
             try:
-                return self._triage_with_llm(subject, body, matched_kb, kb_score, kb_context)
+                return self._triage_with_openai(subject, body, matched_kb, kb_score, kb_context)
             except Exception as e:
-                print(f"[TriageAgent] LLM API call failed with error: {_redact_key(e)}. Falling back to rule engine.")
+                print(f"[TriageAgent] OpenAI API failed ({_redact_key(e)}). Attempting Local Ollama failover...")
 
+        # Tier 3: Local Ollama LLM
+        try:
+            return self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
+        except Exception:
+            pass
+
+        # Tier 4: Deterministic Rule Engine
         return self._triage_rule_engine(subject, body, matched_kb, kb_score)
+
+    def _triage_with_gemini(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
+        import requests
+        gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
+        model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
+        headers = {"Content-Type": "application/json"}
+        prompt = f"Ticket Subject: {subject}\nTicket Body: {body}\nMatched KB: {matched_kb}\nKB Context: {kb_context[:500]}"
+        payload = {
+            "contents": [{"parts": [{"text": f"{TRIAGE_SYSTEM_PROMPT}\n\n{prompt}"}]}],
+            "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}
+        }
+        res = None
+        for attempt in range(2):
+            _throttle_gemini_api()
+            res = requests.post(url, headers=headers, json=payload, timeout=30)
+            if res.status_code in (400, 401, 403):
+                break
+            if res.status_code == 429:
+                time.sleep(2)
+                continue
+            break
+        res.raise_for_status()
+        text_out = res.json()['candidates'][0]['content']['parts'][0]['text']
+        parsed = json.loads(text_out)
+        parsed["matched_kb_doc"] = matched_kb
+        parsed["kb_relevance_score"] = round(kb_score, 3)
+        parsed["execution_mode"] = "LLM_GEMINI"
+        return TriageOutput(**parsed)
+
+    def _triage_with_openai(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
+        import requests
+        openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+        prompt = f"Ticket Subject: {subject}\nTicket Body: {body}\nMatched KB: {matched_kb}\nKB Context: {kb_context[:500]}"
+        url = "https://api.openai.com/v1/chat/completions"
+        headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
+        payload = {
+            "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            "messages": [
+                {"role": "system", "content": TRIAGE_SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            "response_format": {"type": "json_object"},
+            "temperature": 0.1
+        }
+        res = requests.post(url, headers=headers, json=payload, timeout=30)
+        res.raise_for_status()
+        text_out = res.json()['choices'][0]['message']['content']
+        parsed = json.loads(text_out)
+        parsed["matched_kb_doc"] = matched_kb
+        parsed["kb_relevance_score"] = round(kb_score, 3)
+        parsed["execution_mode"] = "LLM_OPENAI"
+        return TriageOutput(**parsed)
 
     def _triage_with_local_llm(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
         import requests
@@ -131,70 +192,6 @@ Return valid JSON only matching the schema.
         parsed["kb_relevance_score"] = round(kb_score, 3)
         parsed["execution_mode"] = f"LLM_LOCAL_OLLAMA ({model_name})"
         return TriageOutput(**parsed)
-
-    def _triage_with_llm(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
-        import requests
-        gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
-        openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
-        
-        prompt = f"""Ticket Subject: {subject}
-Ticket Body: {body}
-
-Matched Knowledge Base Document: {matched_kb}
-KB Context Snippet:
-{kb_context[:500]}
-"""
-
-        if len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_"):
-            model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
-            headers = {"Content-Type": "application/json"}
-            payload = {
-                "contents": [{"parts": [{"text": f"{TRIAGE_SYSTEM_PROMPT}\n\n{prompt}"}]}],
-                "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}
-            }
-            res = None
-            for attempt in range(2):
-                _throttle_gemini_api()
-                res = requests.post(url, headers=headers, json=payload, timeout=30)
-                if res.status_code in (400, 401, 403):
-                    # Non-retryable key/auth error - break immediately
-                    break
-                if res.status_code == 429:
-                    print(f"[TriageAgent] Rate limit 429 encountered. Retrying in 2s (Attempt {attempt+1}/2)...")
-                    time.sleep(2)
-                    continue
-                break
-            res.raise_for_status()
-            res_json = res.json()
-            text_out = res_json['candidates'][0]['content']['parts'][0]['text']
-            parsed = json.loads(text_out)
-            parsed["matched_kb_doc"] = matched_kb
-            parsed["kb_relevance_score"] = round(kb_score, 3)
-            parsed["execution_mode"] = "LLM_GEMINI"
-            return TriageOutput(**parsed)
-        elif openai_key.startswith("sk-"):
-            url = "https://api.openai.com/v1/chat/completions"
-            headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
-            payload = {
-                "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-                "messages": [
-                    {"role": "system", "content": TRIAGE_SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt}
-                ],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.1
-            }
-            res = requests.post(url, headers=headers, json=payload, timeout=10)
-            res.raise_for_status()
-            text_out = res.json()['choices'][0]['message']['content']
-            parsed = json.loads(text_out)
-            parsed["matched_kb_doc"] = matched_kb
-            parsed["kb_relevance_score"] = round(kb_score, 3)
-            parsed["execution_mode"] = "LLM_OPENAI"
-            return TriageOutput(**parsed)
-
-        return self._triage_rule_engine(subject, body, matched_kb, kb_score)
 
     def _triage_rule_engine(self, subject: str, body: str, matched_kb: str, kb_score: float) -> TriageOutput:
         text = f"{subject} {body}".lower()

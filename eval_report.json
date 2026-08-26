@@ -11,7 +11,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.7126,
+      "latency_seconds": 6.5175,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "Authentication",
@@ -28,7 +28,7 @@
       "passed": true,
       "quality_score": 0.8,
       "reasoning": "Expected urgency 'P1', got 'P2'",
-      "latency_seconds": 6.5318,
+      "latency_seconds": 6.5391,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "API Integration",
@@ -45,7 +45,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.6372,
+      "latency_seconds": 6.5557,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "Webhooks",
@@ -62,7 +62,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.4922,
+      "latency_seconds": 6.5043,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "Billing & Invoicing",
@@ -79,7 +79,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.5142,
+      "latency_seconds": 6.5952,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "Billing & Invoicing",
@@ -96,7 +96,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.474,
+      "latency_seconds": 6.6605,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-001",
@@ -114,7 +114,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.5394,
+      "latency_seconds": 6.5489,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-004",
@@ -132,7 +132,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.5236,
+      "latency_seconds": 6.5057,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-001",
@@ -150,7 +150,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.5143,
+      "latency_seconds": 6.5157,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-005",
@@ -168,7 +168,7 @@
       "passed": true,
       "quality_score": 0.85,
       "reasoning": "Exec summary sentence count is 2 (expected 3-5)",
-      "latency_seconds": 0.0004,
+      "latency_seconds": 0.0,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-99999",
