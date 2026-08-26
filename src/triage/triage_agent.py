@@ -86,8 +86,15 @@ class TicketTriageAgent:
         # Step 2: LLM API or Local Rule Engine Classification
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+        use_local_llm = os.getenv("USE_LOCAL_LLM", "false").lower() in ("true", "1", "yes")
         has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
         has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
+
+        if use_local_llm:
+            try:
+                return self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
+            except Exception as e:
+                print(f"[TriageAgent] Local LLM call failed: {e}. Falling back to cloud LLM / rule engine.")
 
         if has_valid_gemini or has_valid_openai:
             try:
@@ -96,6 +103,34 @@ class TicketTriageAgent:
                 print(f"[TriageAgent] LLM API call failed with error: {_redact_key(e)}. Falling back to rule engine.")
 
         return self._triage_rule_engine(subject, body, matched_kb, kb_score)
+
+    def _triage_with_local_llm(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
+        import requests
+        local_url = os.getenv("LOCAL_LLM_URL", "http://localhost:11434/api/generate").strip()
+        model_name = os.getenv("LOCAL_LLM_MODEL", "llama3.2").strip()
+        
+        prompt = f"""{TRIAGE_SYSTEM_PROMPT}
+
+Ticket Subject: {subject}
+Ticket Body: {body}
+Matched Knowledge Base Document: {matched_kb}
+KB Context Snippet: {kb_context[:500]}
+Return valid JSON only matching the schema.
+"""
+        payload = {
+            "model": model_name,
+            "prompt": prompt,
+            "stream": False,
+            "format": "json"
+        }
+        res = requests.post(local_url, json=payload, timeout=15)
+        res.raise_for_status()
+        text_out = res.json().get("response", "")
+        parsed = json.loads(text_out)
+        parsed["matched_kb_doc"] = matched_kb
+        parsed["kb_relevance_score"] = round(kb_score, 3)
+        parsed["execution_mode"] = f"LLM_LOCAL_OLLAMA ({model_name})"
+        return TriageOutput(**parsed)
 
     def _triage_with_llm(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
         import requests

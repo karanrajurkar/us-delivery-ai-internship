@@ -84,8 +84,15 @@ class TAMAccountSummariser:
 
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+        use_local_llm = os.getenv("USE_LOCAL_LLM", "false").lower() in ("true", "1", "yes")
         has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
         has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
+
+        if use_local_llm:
+            try:
+                return self._summarise_with_local_llm(account, tickets_90d, risks)
+            except Exception as e:
+                print(f"[TAMSummariser] Local LLM call failed: {e}. Falling back to cloud LLM / rule engine.")
 
         if has_valid_gemini or has_valid_openai:
             try:
@@ -94,6 +101,52 @@ class TAMAccountSummariser:
                 print(f"[TAMSummariser] LLM call failed: {_redact_key(e)}. Falling back to deterministic rule engine.")
 
         return self._summarise_rule_engine(account, tickets_90d, risks)
+
+    def _summarise_with_local_llm(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
+        import requests
+        local_url = os.getenv("LOCAL_LLM_URL", "http://localhost:11434/api/generate").strip()
+        model_name = os.getenv("LOCAL_LLM_MODEL", "llama3.2").strip()
+        
+        t_summary = f"Total 90d Tickets: {len(tickets)}.\n"
+        for t in tickets[:10]:
+            t_summary += f"- [{t.get('ticket_id')}] ({t.get('product_area')}, {t.get('status')}): {t.get('subject')}\n  Body: {t.get('body')}\n"
+
+        prompt = f"""{SUMMARISER_SYSTEM_PROMPT}
+
+Account Metadata:
+ID: {account.get('account_id')}
+Company: {account.get('company_name')}
+Tier: {account.get('tier')}
+MRR: ${account.get('mrr'):,}
+Health Score: {account.get('health_score')}
+Contract End: {account.get('contract_end_date')}
+
+Recent 90-Day Ticket History:
+{t_summary}
+
+Return valid JSON only matching the schema.
+"""
+        payload = {
+            "model": model_name,
+            "prompt": prompt,
+            "stream": False,
+            "format": "json"
+        }
+        res = requests.post(local_url, json=payload, timeout=15)
+        res.raise_for_status()
+        text_out = res.json().get("response", "")
+        parsed = json.loads(text_out)
+        if risks:
+            parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
+        parsed["execution_mode"] = f"LLM_LOCAL_OLLAMA ({model_name})"
+        return AccountBrief(
+            account_id=account.get("account_id"),
+            company_name=account.get("company_name"),
+            tier=account.get("tier"),
+            mrr=account.get("mrr"),
+            health_score=account.get("health_score"),
+            **parsed
+        )
 
     def _extract_verbatim_risk_quotes(self, tickets: List[Dict[str, Any]]) -> List[RiskFlag]:
         """

@@ -333,6 +333,24 @@ with st.sidebar:
     enable_stream = st.toggle("Enable Real-Time Token Streaming", value=True, help="Simulates real-time SSE token streaming for draft messages.")
     
     st.markdown("---")
+    st.markdown("#### 🧠 AI Execution Engine")
+    llm_engine_choice = st.selectbox(
+        "Select Provider Target:",
+        [
+            "🟢 Cloud Gemini (gemini-3.6-flash)",
+            "🟢 Cloud OpenAI (gpt-4o-mini)",
+            "🦙 Local Ollama LLM (llama3.2 / 100% Free)",
+            "⚙️ Local Deterministic Rule Engine"
+        ],
+        index=0,
+        help="Select between Cloud Gemini, Cloud OpenAI, Local Offline Ollama LLM, or Deterministic Rule Engine."
+    )
+    if "Ollama" in llm_engine_choice:
+        os.environ["USE_LOCAL_LLM"] = "true"
+    else:
+        os.environ["USE_LOCAL_LLM"] = "false"
+    
+    st.markdown("---")
     st.markdown("#### 📊 Dataset Metrics")
     accounts = loader.get_accounts()
     tickets = loader.get_tickets()
@@ -430,6 +448,9 @@ with tab1:
                 elif exec_mode == "LLM_OPENAI":
                     mode_label = "🟢 🤖 Live OpenAI LLM API"
                     mode_color = "#34D399"
+                elif "LOCAL_OLLAMA" in exec_mode:
+                    mode_label = f"🟢 🦙 {exec_mode} (Offline / Free)"
+                    mode_color = "#38BDF8"
                 elif has_key:
                     mode_label = "🟡 ⚙️ Local Rule Engine (Quota Limit / API Failover)"
                     mode_color = "#FBBF24"
@@ -590,6 +611,9 @@ with tab2:
                 elif b_exec_mode == "LLM_OPENAI":
                     b_mode_label = "🟢 🤖 Live OpenAI LLM API"
                     b_mode_color = "#34D399"
+                elif "LOCAL_OLLAMA" in b_exec_mode:
+                    b_mode_label = f"🟢 🦙 {b_exec_mode} (Offline / Free)"
+                    b_mode_color = "#38BDF8"
                 elif b_has_key:
                     b_mode_label = "🟡 ⚙️ Local Rule Engine (Quota Limit / API Failover)"
                     b_mode_color = "#FBBF24"
