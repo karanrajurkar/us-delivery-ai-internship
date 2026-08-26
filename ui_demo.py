@@ -276,9 +276,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ------------------------------------------------------------------------------
-# Service Instantiation with Cache
+# Service Instantiation
 # ------------------------------------------------------------------------------
-@st.cache_resource
 def load_all_services():
     loader = DataLoader()
     triage_agent = TicketTriageAgent(retriever=None)
@@ -416,7 +415,8 @@ with tab1:
                 with st.spinner("Analyzing semantic intent, performing RAG vector lookup..."):
                     t_input = TriageInput(subject=subject, body=body)
                     start_time = time.time()
-                    res = triage_agent.triage(t_input)
+                    active_agent = TicketTriageAgent(retriever=None)
+                    res = active_agent.triage(t_input)
                     elapsed = time.time() - start_time
                 
                 st.success(f"✨ Triage Execution Completed in **{elapsed:.3f} seconds**")
@@ -565,7 +565,8 @@ with tab2:
         with st.container(border=True):
             if btn_brief:
                 with st.spinner("Executing multi-document context synthesis and auditing churn risk quotes..."):
-                    brief = account_summariser.summarise_account(selected_acc_id)
+                    active_summariser = TAMAccountSummariser(loader=loader)
+                    brief = active_summariser.summarise_account(selected_acc_id)
                 
                 st.markdown(f"### 📄 QBR Executive Brief: **{brief.company_name}**")
                 
