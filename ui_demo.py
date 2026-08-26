@@ -432,6 +432,15 @@ with tab1:
         
             if btn_triage and body:
                 with st.spinner("Analyzing semantic intent, performing RAG vector lookup..."):
+                    if "Ollama" in llm_engine_choice:
+                        os.environ["USE_LOCAL_LLM"] = "true"
+                    elif "Rule Engine" in llm_engine_choice:
+                        os.environ["USE_LOCAL_LLM"] = "false"
+                        os.environ["GEMINI_API_KEY"] = ""
+                        os.environ["OPENAI_API_KEY"] = ""
+                    else:
+                        os.environ["USE_LOCAL_LLM"] = "false"
+
                     t_input = TriageInput(subject=subject, body=body)
                     start_time = time.time()
                     active_agent = TicketTriageAgent(retriever=None)

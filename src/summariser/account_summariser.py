@@ -50,7 +50,6 @@ class TAMAccountSummariser:
         self.loader = loader or DataLoader()
 
     def summarise_account(self, account_id: str) -> AccountBrief:
-        load_dotenv(override=True)
         api_key = (os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
 
         account = self.loader.get_account_by_id(account_id)

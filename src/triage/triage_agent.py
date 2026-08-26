@@ -50,8 +50,6 @@ class TicketTriageAgent:
         self.retriever = retriever or KBRetriever()
 
     def triage(self, ticket_input: Union[str, Dict[str, Any], TriageInput]) -> TriageOutput:
-        # Load environment dynamically without overriding runtime environment
-        load_dotenv(override=False)
         api_key = (os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
 
         # Normalize input
