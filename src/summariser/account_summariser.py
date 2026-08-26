@@ -123,7 +123,8 @@ Recent 90-Day Ticket History:
 {t_summary}
 """
         if gemini_key:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_key}"
+            model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
             headers = {"Content-Type": "application/json"}
             payload = {
                 "contents": [{"parts": [{"text": f"{SUMMARISER_SYSTEM_PROMPT}\n\n{prompt}"}]}],
