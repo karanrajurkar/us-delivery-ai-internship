@@ -82,44 +82,90 @@ class TAMAccountSummariser:
         risks = self._extract_verbatim_risk_quotes(tickets_90d)
 
         # Step 2: Check provider preference
+        target_provider = (os.getenv("PREFERRED_LLM_PROVIDER") or "").lower().strip()
         use_local_llm = os.getenv("USE_LOCAL_LLM", "false").lower() in ("true", "1", "yes")
+        if use_local_llm and not target_provider:
+            target_provider = "ollama"
+
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
-        has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
-        has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
+        has_valid_gemini = len(gemini_key) > 10 and gemini_key.startswith("AIzaSy")
+        has_valid_openai = len(openai_key) > 10 and (openai_key.startswith("sk-") or not openai_key.startswith("your_"))
 
-        # Priority 1: User explicitly selected Local Ollama LLM
-        if use_local_llm:
+        # Explicit Rule Engine choice
+        if target_provider == "rule_engine":
+            return self._summarise_rule_engine(account, tickets_90d, risks)
+
+        # Explicit Ollama choice
+        if target_provider == "ollama":
             try:
                 return self._summarise_with_local_llm(account, tickets_90d, risks)
             except Exception as e:
                 print(f"[TAMSummariser] Local LLM call failed: {e}. Falling back to Rule Engine.")
                 return self._summarise_rule_engine(account, tickets_90d, risks)
 
-        # Priority 2: Cloud Gemini -> Cloud OpenAI -> Local Ollama -> Rule Engine
-        if has_valid_gemini:
-            try:
-                return self._summarise_with_gemini(account, tickets_90d, risks)
-            except Exception as e:
-                print(f"[TAMSummariser] Gemini API failed ({_redact_key(e)}). Attempting OpenAI / Ollama failover...")
+        # Target: Gemini requested (or default provider)
+        if target_provider == "gemini" or not target_provider:
+            if has_valid_gemini:
+                try:
+                    return self._summarise_with_gemini(account, tickets_90d, risks)
+                except Exception as e:
+                    err_detail = _redact_key(e)
+                    print(f"[TAMSummariser] Gemini API failed ({err_detail}). Attempting failover...")
+                    try:
+                        res = self._summarise_with_local_llm(account, tickets_90d, risks)
+                        res.execution_mode = f"LLM_LOCAL_OLLAMA (tinyllama) [Fallback: Gemini API Error ({err_detail})]"
+                        return res
+                    except Exception:
+                        res = self._summarise_rule_engine(account, tickets_90d, risks)
+                        res.execution_mode = f"RULE_ENGINE_FALLBACK [Fallback: Gemini API Error ({err_detail})]"
+                        return res
+            else:
+                err_detail = "Invalid/Missing Gemini API Key"
+                print(f"[TAMSummariser] {err_detail}. Attempting failover...")
+                try:
+                    res = self._summarise_with_local_llm(account, tickets_90d, risks)
+                    res.execution_mode = f"LLM_LOCAL_OLLAMA (tinyllama) [Fallback: {err_detail}]"
+                    return res
+                except Exception:
+                    res = self._summarise_rule_engine(account, tickets_90d, risks)
+                    res.execution_mode = f"RULE_ENGINE_FALLBACK [Fallback: {err_detail}]"
+                    return res
 
-        if has_valid_openai:
-            try:
-                return self._summarise_with_openai(account, tickets_90d, risks)
-            except Exception as e:
-                print(f"[TAMSummariser] OpenAI API failed ({_redact_key(e)}). Attempting Local Ollama failover...")
-
-        try:
-            return self._summarise_with_local_llm(account, tickets_90d, risks)
-        except Exception:
-            pass
+        # Target: OpenAI requested
+        if target_provider == "openai":
+            if has_valid_openai:
+                try:
+                    return self._summarise_with_openai(account, tickets_90d, risks)
+                except Exception as e:
+                    err_detail = _redact_key(e)
+                    print(f"[TAMSummariser] OpenAI API failed ({err_detail}). Attempting failover...")
+                    try:
+                        res = self._summarise_with_local_llm(account, tickets_90d, risks)
+                        res.execution_mode = f"LLM_LOCAL_OLLAMA (tinyllama) [Fallback: OpenAI API Error ({err_detail})]"
+                        return res
+                    except Exception:
+                        res = self._summarise_rule_engine(account, tickets_90d, risks)
+                        res.execution_mode = f"RULE_ENGINE_FALLBACK [Fallback: OpenAI API Error ({err_detail})]"
+                        return res
+            else:
+                err_detail = "Invalid/Missing OpenAI API Key"
+                print(f"[TAMSummariser] {err_detail}. Attempting failover...")
+                try:
+                    res = self._summarise_with_local_llm(account, tickets_90d, risks)
+                    res.execution_mode = f"LLM_LOCAL_OLLAMA (tinyllama) [Fallback: {err_detail}]"
+                    return res
+                except Exception:
+                    res = self._summarise_rule_engine(account, tickets_90d, risks)
+                    res.execution_mode = f"RULE_ENGINE_FALLBACK [Fallback: {err_detail}]"
+                    return res
 
         return self._summarise_rule_engine(account, tickets_90d, risks)
 
     def _summarise_with_gemini(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
         import requests
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
-        model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
+        model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
         headers = {"Content-Type": "application/json"}
         t_summary = f"Total 90d Tickets: {len(tickets)}.\n" + "\n".join([f"- [{t.get('ticket_id')}] ({t.get('product_area')}): {t.get('subject')}" for t in tickets[:10]])
@@ -233,8 +279,7 @@ Return valid JSON only matching the schema.
         clean_dict = {
             "executive_summary": str(parsed.get("executive_summary", f"{account.get('company_name')} account health overview. Ticket volume monitored over 90 days.")),
             "open_risks_and_flagged_issues": parsed.get("open_risks_and_flagged_issues", []),
-            "strategic_talking_points": parsed.get("strategic_talking_points", ["Review contract terms ahead of renewal", "Conduct technical check-in with TAM team"]),
-            "contract_recommendation": str(parsed.get("contract_recommendation", "Maintain current tier and schedule QBR")),
+            "recommended_talking_points": parsed.get("recommended_talking_points") or parsed.get("strategic_talking_points") or ["Review contract terms ahead of renewal", "Conduct technical check-in with TAM team"],
             "execution_mode": f"LLM_LOCAL_OLLAMA ({model_name})"
         }
         return AccountBrief(

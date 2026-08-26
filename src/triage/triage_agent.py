@@ -49,9 +49,7 @@ class TicketTriageAgent:
     def __init__(self, retriever: Optional[KBRetriever] = None):
         self.retriever = retriever or KBRetriever()
 
-    def triage(self, ticket_input: Union[str, Dict[str, Any], TriageInput]) -> TriageOutput:
-        api_key = (os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
-
+    def triage(self, ticket_input: Union[str, Dict[str, Any], TriageInput], provider: Optional[str] = None) -> TriageOutput:
         # Normalize input
         if isinstance(ticket_input, str):
             try:
@@ -82,44 +80,93 @@ class TicketTriageAgent:
             matched_kb, kb_score, kb_context = retrieved_docs[0]
 
         # Step 2: Check provider preference
+        target_provider = (provider or os.getenv("PREFERRED_LLM_PROVIDER") or "").lower().strip()
         use_local_llm = os.getenv("USE_LOCAL_LLM", "false").lower() in ("true", "1", "yes")
+        if use_local_llm and not target_provider:
+            target_provider = "ollama"
+
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
-        has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
-        has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
+        has_valid_gemini = len(gemini_key) > 10 and gemini_key.startswith("AIzaSy")
+        has_valid_openai = len(openai_key) > 10 and (openai_key.startswith("sk-") or not openai_key.startswith("your_"))
 
-        # Priority 1: User explicitly selected Local Ollama LLM
-        if use_local_llm:
+        # Explicit Rule Engine choice
+        if target_provider == "rule_engine":
+            return self._triage_rule_engine(subject, body, matched_kb, kb_score)
+
+        # Explicit Ollama choice
+        if target_provider == "ollama":
             try:
                 return self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
             except Exception as e:
                 print(f"[TriageAgent] Local LLM execution failed: {e}. Falling back to Rule Engine.")
                 return self._triage_rule_engine(subject, body, matched_kb, kb_score)
 
-        # Priority 2: Cloud Gemini -> Cloud OpenAI -> Local Ollama -> Rule Engine
-        if has_valid_gemini:
-            try:
-                return self._triage_with_gemini(subject, body, matched_kb, kb_score, kb_context)
-            except Exception as e:
-                print(f"[TriageAgent] Gemini API failed ({_redact_key(e)}). Attempting OpenAI / Ollama failover...")
+        # Target: Gemini requested (or default provider)
+        if target_provider == "gemini" or not target_provider:
+            if has_valid_gemini:
+                try:
+                    return self._triage_with_gemini(subject, body, matched_kb, kb_score, kb_context)
+                except Exception as e:
+                    err_detail = _redact_key(e)
+                    print(f"[TriageAgent] Gemini API call failed ({err_detail}). Attempting failover...")
+                    # Fallback to Ollama if available
+                    try:
+                        res = self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
+                        res.execution_mode = f"LLM_LOCAL_OLLAMA (tinyllama) [Fallback: Gemini API Error ({err_detail})]"
+                        return res
+                    except Exception:
+                        res = self._triage_rule_engine(subject, body, matched_kb, kb_score)
+                        res.execution_mode = f"RULE_ENGINE_FALLBACK [Fallback: Gemini API Error ({err_detail})]"
+                        return res
+            else:
+                # Key is missing or invalid placeholder
+                err_detail = "Invalid/Missing Gemini API Key"
+                print(f"[TriageAgent] {err_detail}. Attempting failover...")
+                try:
+                    res = self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
+                    res.execution_mode = f"LLM_LOCAL_OLLAMA (tinyllama) [Fallback: {err_detail}]"
+                    return res
+                except Exception:
+                    res = self._triage_rule_engine(subject, body, matched_kb, kb_score)
+                    res.execution_mode = f"RULE_ENGINE_FALLBACK [Fallback: {err_detail}]"
+                    return res
 
-        if has_valid_openai:
-            try:
-                return self._triage_with_openai(subject, body, matched_kb, kb_score, kb_context)
-            except Exception as e:
-                print(f"[TriageAgent] OpenAI API failed ({_redact_key(e)}). Attempting Local Ollama failover...")
+        # Target: OpenAI requested
+        if target_provider == "openai":
+            if has_valid_openai:
+                try:
+                    return self._triage_with_openai(subject, body, matched_kb, kb_score, kb_context)
+                except Exception as e:
+                    err_detail = _redact_key(e)
+                    print(f"[TriageAgent] OpenAI API call failed ({err_detail}). Attempting failover...")
+                    try:
+                        res = self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
+                        res.execution_mode = f"LLM_LOCAL_OLLAMA (tinyllama) [Fallback: OpenAI API Error ({err_detail})]"
+                        return res
+                    except Exception:
+                        res = self._triage_rule_engine(subject, body, matched_kb, kb_score)
+                        res.execution_mode = f"RULE_ENGINE_FALLBACK [Fallback: OpenAI API Error ({err_detail})]"
+                        return res
+            else:
+                err_detail = "Invalid/Missing OpenAI API Key"
+                print(f"[TriageAgent] {err_detail}. Attempting failover...")
+                try:
+                    res = self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
+                    res.execution_mode = f"LLM_LOCAL_OLLAMA (tinyllama) [Fallback: {err_detail}]"
+                    return res
+                except Exception:
+                    res = self._triage_rule_engine(subject, body, matched_kb, kb_score)
+                    res.execution_mode = f"RULE_ENGINE_FALLBACK [Fallback: {err_detail}]"
+                    return res
 
-        try:
-            return self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
-        except Exception:
-            pass
-
+        # Ultimate fallback
         return self._triage_rule_engine(subject, body, matched_kb, kb_score)
 
     def _triage_with_gemini(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
         import requests
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
-        model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
+        model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
         headers = {"Content-Type": "application/json"}
         prompt = f"Ticket Subject: {subject}\nTicket Body: {body}\nMatched KB: {matched_kb}\nKB Context: {kb_context[:500]}"

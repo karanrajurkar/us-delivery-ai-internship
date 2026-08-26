@@ -337,7 +337,7 @@ with st.sidebar:
     llm_engine_choice = st.selectbox(
         "Select Provider Target:",
         [
-            "🟢 Cloud Gemini (gemini-3.6-flash)",
+            "🟢 Cloud Gemini (gemini-1.5-flash)",
             "🟢 Cloud OpenAI (gpt-4o-mini)",
             "🦙 Local Ollama LLM (tinyllama / 100% Free)",
             "⚙️ Local Deterministic Rule Engine"
@@ -345,9 +345,17 @@ with st.sidebar:
         index=0,
         help="Select between Cloud Gemini, Cloud OpenAI, Local Offline Ollama LLM, or Deterministic Rule Engine."
     )
-    if "Ollama" in llm_engine_choice:
+    if "Gemini" in llm_engine_choice:
+        os.environ["PREFERRED_LLM_PROVIDER"] = "gemini"
+        os.environ["USE_LOCAL_LLM"] = "false"
+    elif "OpenAI" in llm_engine_choice:
+        os.environ["PREFERRED_LLM_PROVIDER"] = "openai"
+        os.environ["USE_LOCAL_LLM"] = "false"
+    elif "Ollama" in llm_engine_choice:
+        os.environ["PREFERRED_LLM_PROVIDER"] = "ollama"
         os.environ["USE_LOCAL_LLM"] = "true"
-    else:
+    elif "Rule Engine" in llm_engine_choice:
+        os.environ["PREFERRED_LLM_PROVIDER"] = "rule_engine"
         os.environ["USE_LOCAL_LLM"] = "false"
     
     st.markdown("---")
@@ -432,13 +440,17 @@ with tab1:
         
             if btn_triage and body:
                 with st.spinner("Analyzing semantic intent, performing RAG vector lookup..."):
-                    if "Ollama" in llm_engine_choice:
+                    if "Gemini" in llm_engine_choice:
+                        os.environ["PREFERRED_LLM_PROVIDER"] = "gemini"
+                        os.environ["USE_LOCAL_LLM"] = "false"
+                    elif "OpenAI" in llm_engine_choice:
+                        os.environ["PREFERRED_LLM_PROVIDER"] = "openai"
+                        os.environ["USE_LOCAL_LLM"] = "false"
+                    elif "Ollama" in llm_engine_choice:
+                        os.environ["PREFERRED_LLM_PROVIDER"] = "ollama"
                         os.environ["USE_LOCAL_LLM"] = "true"
                     elif "Rule Engine" in llm_engine_choice:
-                        os.environ["USE_LOCAL_LLM"] = "false"
-                        os.environ["GEMINI_API_KEY"] = ""
-                        os.environ["OPENAI_API_KEY"] = ""
-                    else:
+                        os.environ["PREFERRED_LLM_PROVIDER"] = "rule_engine"
                         os.environ["USE_LOCAL_LLM"] = "false"
 
                     t_input = TriageInput(subject=subject, body=body)
@@ -450,7 +462,6 @@ with tab1:
                 st.success(f"✨ Triage Execution Completed in **{elapsed:.3f} seconds**")
 
                 exec_mode = getattr(res, "execution_mode", "RULE_ENGINE_FALLBACK")
-                has_key = bool((os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip())
                 if exec_mode == "LLM_GEMINI":
                     mode_label = "🟢 🤖 Live Gemini LLM API"
                     mode_color = "#34D399"
@@ -458,14 +469,24 @@ with tab1:
                     mode_label = "🟢 🤖 Live OpenAI LLM API"
                     mode_color = "#34D399"
                 elif "LOCAL_OLLAMA" in exec_mode:
-                    mode_label = f"🟢 🦙 {exec_mode} (Offline / Free)"
-                    mode_color = "#38BDF8"
-                elif has_key:
-                    mode_label = "🟡 ⚙️ Local Rule Engine (Quota Limit / API Failover)"
-                    mode_color = "#FBBF24"
+                    if "[Fallback:" in exec_mode:
+                        reason = exec_mode.split("[Fallback:")[1].rstrip("]")
+                        mode_label = f"🟡 🦙 Local Ollama Fallback (Reason: {reason})"
+                        mode_color = "#FBBF24"
+                    else:
+                        mode_label = f"🟢 🦙 {exec_mode} (Offline / Free)"
+                        mode_color = "#38BDF8"
+                elif "RULE_ENGINE_FALLBACK" in exec_mode:
+                    if "[Fallback:" in exec_mode:
+                        reason = exec_mode.split("[Fallback:")[1].rstrip("]")
+                        mode_label = f"🟡 ⚙️ Local Rule Engine (Reason: {reason})"
+                        mode_color = "#FBBF24"
+                    else:
+                        mode_label = "⚙️ Local Deterministic Rule Engine"
+                        mode_color = "#94A3B8"
                 else:
-                    mode_label = "⚙️ Local Rule Engine Fallback (No API Key Provided)"
-                    mode_color = "#F59E0B"
+                    mode_label = f"⚙️ {exec_mode}"
+                    mode_color = "#FBBF24"
                 
                 st.markdown(
                     f"""

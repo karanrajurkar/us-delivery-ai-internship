@@ -111,12 +111,14 @@ flowchart TB
 
 ---
 
-## 🚀 Quickstart & Setup
+## 🚀 Quickstart & Setup Guide for Evaluators / Task Providers
+
+The system is designed to run seamlessly with **Cloud Gemini**, **Cloud OpenAI**, **Local Offline Ollama**, or **Deterministic Rule Engine (No API Key Required)**.
 
 ### Option A: ⚡ 1-Click Automated Launcher (Easiest)
-Simply run the 1-click launcher script for your OS (automates `.env` template creation, dependency check, data setup, evaluation harness, and launches the Streamlit UI):
+Automates `.env` creation, virtual environment, dependency checks, mock data setup, evaluation harness execution, and launches the Streamlit UI:
 
-* **Windows**: Double-click [`run.bat`](run.bat) or run in terminal:
+* **Windows**: Double-click [`run.bat`](run.bat) or run in PowerShell / Command Prompt:
   ```powershell
   .\run.bat
   ```
@@ -128,32 +130,78 @@ Simply run the 1-click launcher script for your OS (automates `.env` template cr
 
 ---
 
-### Option B: Manual Setup & Execution
+### Option B: Step-by-Step Manual Setup
 
-#### 1. Prerequisites & Installation
+#### 1. Prerequisites & Virtual Environment
 - Python 3.10+
-- Configure API key in `.env` (copied from `.env.example`):
+- Create virtual environment & install dependencies:
   ```bash
-  cp .env.example .env
-  # Add your GEMINI_API_KEY or OPENAI_API_KEY
-  ```
-- Install dependencies:
-  ```bash
+  python -m venv .venv
+  # Windows:
+  .\.venv\Scripts\pip.exe install -r requirements.txt
+  # Linux/macOS:
+  source .venv/bin/activate
   pip install -r requirements.txt
   ```
 
-#### 2. Running the System (Single Entry-Point Command)
-To run data initialization, execute the full evaluation harness, and view system results:
+#### 2. Configure Execution Engine & API Keys (`.env`)
+Copy `.env.example` to `.env`:
 ```bash
-python main.py
+cp .env.example .env
 ```
+Choose your preferred AI execution target:
 
-#### 3. Additional Execution Commands & Options
-- **Launch Interactive Streamlit UI**: `streamlit run ui_demo.py`
-- **Start FastAPI REST Server**: `python main.py --server` *(Runs on `http://localhost:8000`)*
-- **Run Evaluation Harness Only**: `python main.py --eval`
-- **Run Sample Ticket Triage**: `python main.py --triage-sample`
-- **Run Sample TAM Account Brief**: `python main.py --summarise-sample`
+- **Mode 1: Cloud Gemini (Recommended)**
+  - Set `PREFERRED_LLM_PROVIDER=gemini` and `GEMINI_MODEL=gemini-1.5-flash`.
+  - Add your Google AI Studio key: `GEMINI_API_KEY=AIzaSy...` (Get free key at [Google AI Studio](https://aistudio.google.com/)).
+- **Mode 2: Local Offline Ollama (100% Free & Offline)**
+  - Follow the [Ollama Setup Guide](#-setting-up-local-offline-ollama) below.
+  - Set `PREFERRED_LLM_PROVIDER=ollama` or select **🦙 Local Ollama LLM** in the Streamlit UI sidebar.
+- **Mode 3: Deterministic Rule Engine (100% Uptime Fallback / No Key Needed)**
+  - Set `PREFERRED_LLM_PROVIDER=rule_engine` or select **⚙️ Local Rule Engine** in the UI sidebar.
+  - Runs instantly without any API keys or local LLM setup.
+
+*Note: If a Cloud provider API key is missing or invalid, the system automatically and safely falls back to Local Ollama or Rule Engine, displaying a yellow diagnostic badge in the UI explaining the failover reason.*
+
+---
+
+### 🦙 Setting Up Local Offline Ollama
+
+If you want to run LLM inference 100% offline and free without any cloud API keys:
+
+1. **Download & Install Ollama**:
+   - **Windows / macOS**: Download installer from [ollama.com/download](https://ollama.com/download) and run setup.
+   - **Linux**: Run `curl -fsSL https://ollama.com/install.sh | sh`
+
+2. **Pull the Lightweight Model (`tinyllama`)**:
+   Open terminal / command prompt and run:
+   ```bash
+   ollama pull tinyllama
+   ```
+
+3. **Verify Service**:
+   Ensure Ollama is running in the background at `http://localhost:11434`. You can test by opening `http://localhost:11434` in your browser (returns `"Ollama is running"`).
+
+---
+
+### Execution Commands
+- **Default Entry-Point (Data Setup + Eval Suite)**:
+  ```bash
+  python main.py
+  ```
+- **Launch Interactive Streamlit UI**:
+  ```bash
+  streamlit run ui_demo.py
+  ```
+- **Start FastAPI REST Server**:
+  ```bash
+  python main.py --server
+  ```
+  *(API Swagger documentation available at `http://localhost:8000/docs`)*
+- **Run Evaluation Harness Only**:
+  ```bash
+  python main.py --eval
+  ```
 
 ---
 

@@ -12,7 +12,7 @@ if not exist ".env" (
 )
 
 if not exist ".venv" (
-    echo [2/4] Creating Python virtual environment (.venv)...
+    echo [2/4] Creating Python virtual environment .venv...
     python -m venv .venv
 ) else (
     echo [2/4] Virtual environment found.
@@ -21,12 +21,12 @@ if not exist ".venv" (
 echo [3/4] Checking dependencies...
 .\.venv\Scripts\pip.exe install -q -r requirements.txt
 
-echo [4/4] Running Mock Data Setup ^& Evaluation Harness...
-.\.venv\Scripts\python.exe main.py --eval
+echo [4/4] Running Mock Data Setup and Evaluation Harness...
+.\.venv\Scripts\python.exe main.py
 
 echo.
 echo ===================================================================
 echo System ready! Starting Interactive Streamlit UI...
 echo ===================================================================
 echo.
-.\.venv\Scripts\streamlit.exe run ui_demo.py
+.\.venv\Scripts\python.exe -m streamlit run ui_demo.py

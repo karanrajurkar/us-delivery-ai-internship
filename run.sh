@@ -19,7 +19,7 @@ fi
 # 2. Find Python 3 binary
 if command -v python3 &>/dev/null; then
     PYTHON_CMD="python3"
-elif command -v python &>/dev/null; then
+elif command -v python &>/devnull; then
     PYTHON_CMD="python"
 else
     echo "❌ Error: Python 3 is not installed or not in PATH."
@@ -48,4 +48,4 @@ echo "==================================================================="
 echo "✨ System ready! Starting Interactive Streamlit UI..."
 echo "==================================================================="
 echo ""
-.venv/bin/streamlit run ui_demo.py
+.venv/bin/python -m streamlit run ui_demo.py
