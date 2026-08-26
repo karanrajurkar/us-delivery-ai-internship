@@ -422,8 +422,19 @@ with tab1:
                 st.success(f"✨ Triage Execution Completed in **{elapsed:.3f} seconds**")
 
                 exec_mode = getattr(res, "execution_mode", "RULE_ENGINE_FALLBACK")
-                mode_label = "🤖 Live Gemini LLM API" if exec_mode == "LLM_GEMINI" else ("🤖 Live OpenAI LLM API" if exec_mode == "LLM_OPENAI" else "⚙️ Local Rule Engine Fallback (No API Key)")
-                mode_color = "#34D399" if "LLM" in exec_mode else "#FBBF24"
+                has_key = bool((os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip())
+                if exec_mode == "LLM_GEMINI":
+                    mode_label = "🟢 🤖 Live Gemini LLM API"
+                    mode_color = "#34D399"
+                elif exec_mode == "LLM_OPENAI":
+                    mode_label = "🟢 🤖 Live OpenAI LLM API"
+                    mode_color = "#34D399"
+                elif has_key:
+                    mode_label = "🟡 ⚙️ Local Rule Engine (Quota Limit / API Failover)"
+                    mode_color = "#FBBF24"
+                else:
+                    mode_label = "⚙️ Local Rule Engine Fallback (No API Key Provided)"
+                    mode_color = "#F59E0B"
                 
                 st.markdown(
                     f"""
@@ -571,8 +582,19 @@ with tab2:
                 st.markdown(f"### 📄 QBR Executive Brief: **{brief.company_name}**")
                 
                 b_exec_mode = getattr(brief, "execution_mode", "RULE_ENGINE_FALLBACK")
-                b_mode_label = "🤖 Live Gemini LLM API" if b_exec_mode == "LLM_GEMINI" else ("🤖 Live OpenAI LLM API" if b_exec_mode == "LLM_OPENAI" else "⚙️ Local Rule Engine Fallback (No API Key)")
-                b_mode_color = "#34D399" if "LLM" in b_exec_mode else "#FBBF24"
+                b_has_key = bool((os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip())
+                if b_exec_mode == "LLM_GEMINI":
+                    b_mode_label = "🟢 🤖 Live Gemini LLM API"
+                    b_mode_color = "#34D399"
+                elif b_exec_mode == "LLM_OPENAI":
+                    b_mode_label = "🟢 🤖 Live OpenAI LLM API"
+                    b_mode_color = "#34D399"
+                elif b_has_key:
+                    b_mode_label = "🟡 ⚙️ Local Rule Engine (Quota Limit / API Failover)"
+                    b_mode_color = "#FBBF24"
+                else:
+                    b_mode_label = "⚙️ Local Rule Engine Fallback (No API Key Provided)"
+                    b_mode_color = "#F59E0B"
                 
                 st.markdown(
                     f"""
