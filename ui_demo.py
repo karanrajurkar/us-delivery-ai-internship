@@ -369,10 +369,25 @@ with tab1:
             st.markdown(f"**Urgency Reasoning:** {res.urgency_reasoning}")
             st.markdown("---")
             
-            m1, m2, m3 = st.columns(3)
-            m1.metric("Product Area", res.product_area)
-            m2.metric("Issue Category", res.issue_category)
-            m3.metric("Assigned Team", res.recommended_team)
+            st.markdown(
+                f"""
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0;">
+                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 14px 10px; text-align: center;">
+                        <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Product Area</div>
+                        <div style="font-size: 1.0rem; font-weight: 700; color: #38BDF8; margin-top: 4px; word-wrap: break-word;">{res.product_area}</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 14px 10px; text-align: center;">
+                        <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Issue Category</div>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: #C084FC; margin-top: 4px; word-wrap: break-word;">{res.issue_category}</div>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 14px 10px; text-align: center;">
+                        <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Assigned Team</div>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: #F472B6; margin-top: 4px; word-wrap: break-word;">{res.recommended_team}</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
             
             st.markdown("---")
             st.markdown(f"📚 **Matched KB Article:** `{res.matched_kb_doc}` *(Relevance Score: {res.kb_relevance_score})*")
