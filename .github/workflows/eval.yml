@@ -9,13 +9,15 @@ on:
 jobs:
   run-eval-harness:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python 3.12
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.12'
 
@@ -24,18 +26,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Generate Mock Data
+    - name: Run Single Entry-Point Evaluation Harness
       run: |
-        python data/generate_mock_data.py
-
-    - name: Run Evaluation Harness
-      run: |
-        python -m src.eval.eval_harness
+        python main.py --eval
 
     - name: Upload Eval Report Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: eval-reports
         path: |
           eval_report.json
           eval_report.md
+
