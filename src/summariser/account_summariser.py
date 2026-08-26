@@ -16,6 +16,16 @@ class RiskFlag(BaseModel):
     ticket_id: str = Field(description="ID of the ticket triggering the flag")
     justification_quote: str = Field(description="EXACT verbatim quote from the ticket body justifying the flag")
 
+LAST_GEMINI_SUMM_CALL_TIME = 0.0
+
+def _throttle_gemini_summ_api():
+    global LAST_GEMINI_SUMM_CALL_TIME
+    now = time.time()
+    elapsed = now - LAST_GEMINI_SUMM_CALL_TIME
+    if elapsed < 4.0:
+        time.sleep(4.0 - elapsed)
+    LAST_GEMINI_SUMM_CALL_TIME = time.time()
+
 class AccountBrief(BaseModel):
     account_id: str
     company_name: str
@@ -132,15 +142,17 @@ Recent 90-Day Ticket History:
                 "generationConfig": {"temperature": 0.0, "seed": 42, "responseMimeType": "application/json"}
             }
             res = None
-            for attempt in range(4):
-                res = requests.post(url, headers=headers, json=payload, timeout=25)
+            for attempt in range(5):
+                _throttle_gemini_summ_api()
+                res = requests.post(url, headers=headers, json=payload, timeout=30)
                 if res.status_code == 429:
-                    time.sleep(4 * (attempt + 1))
+                    print(f"[TAMSummariser] Rate limit 429 hit. Backing off for {5 * (attempt + 1)}s (Attempt {attempt+1}/5)...")
+                    time.sleep(5 * (attempt + 1))
                     continue
                 if res.status_code == 401:
                     headers["Authorization"] = f"Bearer {gemini_key}"
                     url_no_key = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-                    res = requests.post(url_no_key, headers=headers, json=payload, timeout=25)
+                    res = requests.post(url_no_key, headers=headers, json=payload, timeout=30)
                 break
             res.raise_for_status()
             res_json = res.json()
