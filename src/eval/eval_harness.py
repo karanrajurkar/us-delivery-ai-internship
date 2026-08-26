@@ -131,6 +131,7 @@ class EvaluationHarness:
                 }
             ))
             print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) - {t['desc']}")
+            time.sleep(1.5)
 
         return results
 
@@ -239,6 +240,7 @@ class EvaluationHarness:
                 }
             ))
             print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) - {t['desc']}")
+            time.sleep(1.5)
 
         return results
 

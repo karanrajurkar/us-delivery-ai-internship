@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import time
 from typing import Dict, Any, Optional, Union
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
@@ -95,12 +96,17 @@ KB Context Snippet:
                 "contents": [{"parts": [{"text": f"{TRIAGE_SYSTEM_PROMPT}\n\n{prompt}"}]}],
                 "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}
             }
-            res = requests.post(url, headers=headers, json=payload, timeout=25)
-            if res.status_code == 401:
-                # Try Bearer header for token-based keys
-                headers["Authorization"] = f"Bearer {gemini_key}"
-                url_no_key = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-                res = requests.post(url_no_key, headers=headers, json=payload, timeout=25)
+            res = None
+            for attempt in range(4):
+                res = requests.post(url, headers=headers, json=payload, timeout=25)
+                if res.status_code == 429:
+                    time.sleep(4 * (attempt + 1))
+                    continue
+                if res.status_code == 401:
+                    headers["Authorization"] = f"Bearer {gemini_key}"
+                    url_no_key = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+                    res = requests.post(url_no_key, headers=headers, json=payload, timeout=25)
+                break
             res.raise_for_status()
             res_json = res.json()
             text_out = res_json['candidates'][0]['content']['parts'][0]['text']
