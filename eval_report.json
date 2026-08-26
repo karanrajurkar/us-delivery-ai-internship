@@ -11,7 +11,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.489,
+      "latency_seconds": 6.7126,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "Authentication",
@@ -28,7 +28,7 @@
       "passed": true,
       "quality_score": 0.8,
       "reasoning": "Expected urgency 'P1', got 'P2'",
-      "latency_seconds": 6.6916,
+      "latency_seconds": 6.5318,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "API Integration",
@@ -45,7 +45,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.8167,
+      "latency_seconds": 6.6372,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "Webhooks",
@@ -62,7 +62,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.6049,
+      "latency_seconds": 6.4922,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "Billing & Invoicing",
@@ -79,7 +79,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.4184,
+      "latency_seconds": 6.5142,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "product_area": "Billing & Invoicing",
@@ -96,13 +96,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.5791,
+      "latency_seconds": 6.474,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 9,
+        "risk_flag_count": 7,
         "talking_points_count": 4
       }
     },
@@ -114,13 +114,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.9887,
+      "latency_seconds": 6.5394,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-004",
         "company_name": "CyberShield Inc",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 13,
+        "risk_flag_count": 8,
         "talking_points_count": 4
       }
     },
@@ -132,13 +132,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.856,
+      "latency_seconds": 6.5236,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 9,
+        "risk_flag_count": 7,
         "talking_points_count": 4
       }
     },
@@ -150,13 +150,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 6.9242,
+      "latency_seconds": 6.5143,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-005",
         "company_name": "DataDynamics",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 6,
+        "risk_flag_count": 12,
         "talking_points_count": 4
       }
     },
@@ -168,7 +168,7 @@
       "passed": true,
       "quality_score": 0.85,
       "reasoning": "Exec summary sentence count is 2 (expected 3-5)",
-      "latency_seconds": 0.0028,
+      "latency_seconds": 0.0004,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-99999",

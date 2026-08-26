@@ -134,7 +134,7 @@ class EvaluationHarness:
             ))
             mode_tag = out_dict.get("execution_mode", "RULE_ENGINE_FALLBACK")
             print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) [{mode_tag}] - {t['desc']}")
-            time.sleep(1.5)
+            time.sleep(4.2)
 
         return results
 
@@ -245,7 +245,7 @@ class EvaluationHarness:
             ))
             mode_tag = out_dict.get("execution_mode", "RULE_ENGINE_FALLBACK")
             print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) [{mode_tag}] - {t['desc']}")
-            time.sleep(1.5)
+            time.sleep(4.2)
 
         return results
 
