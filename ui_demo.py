@@ -417,8 +417,9 @@ with tab1:
                 
                 st.success(f"✨ Triage Execution Completed in **{elapsed:.3f} seconds**")
 
-                mode_label = "🤖 Live Gemini LLM API" if res.execution_mode == "LLM_GEMINI" else ("🤖 Live OpenAI LLM API" if res.execution_mode == "LLM_OPENAI" else "⚙️ Local Rule Engine Fallback (No API Key)")
-                mode_color = "#34D399" if "LLM" in res.execution_mode else "#FBBF24"
+                exec_mode = getattr(res, "execution_mode", "RULE_ENGINE_FALLBACK")
+                mode_label = "🤖 Live Gemini LLM API" if exec_mode == "LLM_GEMINI" else ("🤖 Live OpenAI LLM API" if exec_mode == "LLM_OPENAI" else "⚙️ Local Rule Engine Fallback (No API Key)")
+                mode_color = "#34D399" if "LLM" in exec_mode else "#FBBF24"
                 
                 st.markdown(
                     f"""
@@ -564,8 +565,9 @@ with tab2:
                 
                 st.markdown(f"### 📄 QBR Executive Brief: **{brief.company_name}**")
                 
-                b_mode_label = "🤖 Live Gemini LLM API" if brief.execution_mode == "LLM_GEMINI" else ("🤖 Live OpenAI LLM API" if brief.execution_mode == "LLM_OPENAI" else "⚙️ Local Rule Engine Fallback (No API Key)")
-                b_mode_color = "#34D399" if "LLM" in brief.execution_mode else "#FBBF24"
+                b_exec_mode = getattr(brief, "execution_mode", "RULE_ENGINE_FALLBACK")
+                b_mode_label = "🤖 Live Gemini LLM API" if b_exec_mode == "LLM_GEMINI" else ("🤖 Live OpenAI LLM API" if b_exec_mode == "LLM_OPENAI" else "⚙️ Local Rule Engine Fallback (No API Key)")
+                b_mode_color = "#34D399" if "LLM" in b_exec_mode else "#FBBF24"
                 
                 st.markdown(
                     f"""
