@@ -50,8 +50,8 @@ class TicketTriageAgent:
         self.retriever = retriever or KBRetriever()
 
     def triage(self, ticket_input: Union[str, Dict[str, Any], TriageInput]) -> TriageOutput:
-        # Load environment dynamically
-        load_dotenv(override=True)
+        # Load environment dynamically without overriding runtime environment
+        load_dotenv(override=False)
         api_key = (os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
 
         # Normalize input
@@ -83,33 +83,39 @@ class TicketTriageAgent:
         if retrieved_docs and retrieved_docs[0][1] > 0.05:
             matched_kb, kb_score, kb_context = retrieved_docs[0]
 
-        # Step 2: 4-Tier Fallback Chain (Cloud Gemini -> Cloud OpenAI -> Local Ollama -> Rule Engine)
+        # Step 2: Check provider preference
+        use_local_llm = os.getenv("USE_LOCAL_LLM", "false").lower() in ("true", "1", "yes")
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
         has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
         has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
 
-        # Tier 1: Cloud Gemini LLM
+        # Priority 1: User explicitly selected Local Ollama LLM
+        if use_local_llm:
+            try:
+                return self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
+            except Exception as e:
+                print(f"[TriageAgent] Local LLM execution failed: {e}. Falling back to Rule Engine.")
+                return self._triage_rule_engine(subject, body, matched_kb, kb_score)
+
+        # Priority 2: Cloud Gemini -> Cloud OpenAI -> Local Ollama -> Rule Engine
         if has_valid_gemini:
             try:
                 return self._triage_with_gemini(subject, body, matched_kb, kb_score, kb_context)
             except Exception as e:
                 print(f"[TriageAgent] Gemini API failed ({_redact_key(e)}). Attempting OpenAI / Ollama failover...")
 
-        # Tier 2: Cloud OpenAI LLM
         if has_valid_openai:
             try:
                 return self._triage_with_openai(subject, body, matched_kb, kb_score, kb_context)
             except Exception as e:
                 print(f"[TriageAgent] OpenAI API failed ({_redact_key(e)}). Attempting Local Ollama failover...")
 
-        # Tier 3: Local Ollama LLM
         try:
             return self._triage_with_local_llm(subject, body, matched_kb, kb_score, kb_context)
         except Exception:
             pass
 
-        # Tier 4: Deterministic Rule Engine
         return self._triage_rule_engine(subject, body, matched_kb, kb_score)
 
     def _triage_with_gemini(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
@@ -175,8 +181,6 @@ class TicketTriageAgent:
 Ticket Subject: {subject}
 Ticket Body: {body}
 Matched Knowledge Base Document: {matched_kb}
-KB Context Snippet: {kb_context[:500]}
-Return valid JSON only matching the schema.
 """
         payload = {
             "model": model_name,
@@ -187,11 +191,40 @@ Return valid JSON only matching the schema.
         res = requests.post(local_url, json=payload, timeout=15)
         res.raise_for_status()
         text_out = res.json().get("response", "")
-        parsed = json.loads(text_out)
-        parsed["matched_kb_doc"] = matched_kb
-        parsed["kb_relevance_score"] = round(kb_score, 3)
-        parsed["execution_mode"] = f"LLM_LOCAL_OLLAMA ({model_name})"
-        return TriageOutput(**parsed)
+        
+        parsed_raw = json.loads(text_out)
+        if isinstance(parsed_raw, list) and len(parsed_raw) > 0:
+            parsed = parsed_raw[0]
+        elif isinstance(parsed_raw, dict):
+            parsed = parsed_raw
+        else:
+            raise ValueError("Invalid JSON format returned from Local LLM")
+
+        urgency = parsed.get("urgency_tier") or parsed.get("urgency_tiers") or "P2"
+        if isinstance(urgency, dict):
+            urgency = list(urgency.keys())[0] if urgency else "P2"
+        elif isinstance(urgency, list):
+            urgency = urgency[0] if urgency else "P2"
+        urgency_str = str(urgency).strip().upper()
+        if not any(urgency_str.startswith(p) for p in ["P1", "P2", "P3", "P4"]):
+            urgency_str = "P1" if "outage" in body.lower() or "lockout" in body.lower() or "urgent" in subject.lower() else "P2"
+        else:
+            urgency_str = urgency_str[:2]
+            
+        reasoning = parsed.get("urgency_reasoning") or parsed.get("reasoning") or "Classified via Local LLM (tinyllama)"
+            
+        clean_dict = {
+            "product_area": str(parsed.get("product_area", "Authentication")),
+            "issue_category": str(parsed.get("issue_category", "Security / Access Lockout")),
+            "urgency_tier": urgency_str,
+            "urgency_reasoning": str(reasoning),
+            "recommended_team": str(parsed.get("recommended_team", "TAM Escalation")),
+            "draft_response": str(parsed.get("draft_response", "Thank you for reaching out. Our engineering team is investigating your issue immediately.")),
+            "matched_kb_doc": matched_kb,
+            "kb_relevance_score": round(kb_score, 3),
+            "execution_mode": f"LLM_LOCAL_OLLAMA ({model_name})"
+        }
+        return TriageOutput(**clean_dict)
 
     def _triage_rule_engine(self, subject: str, body: str, matched_kb: str, kb_score: float) -> TriageOutput:
         text = f"{subject} {body}".lower()

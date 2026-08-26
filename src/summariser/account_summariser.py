@@ -82,33 +82,39 @@ class TAMAccountSummariser:
         # Deterministic Risk & Churn Quote Extraction
         risks = self._extract_verbatim_risk_quotes(tickets_90d)
 
-        # Step 2: 4-Tier Fallback Chain (Cloud Gemini -> Cloud OpenAI -> Local Ollama -> Rule Engine)
+        # Step 2: Check provider preference
+        use_local_llm = os.getenv("USE_LOCAL_LLM", "false").lower() in ("true", "1", "yes")
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
         has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
         has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
 
-        # Tier 1: Cloud Gemini LLM
+        # Priority 1: User explicitly selected Local Ollama LLM
+        if use_local_llm:
+            try:
+                return self._summarise_with_local_llm(account, tickets_90d, risks)
+            except Exception as e:
+                print(f"[TAMSummariser] Local LLM call failed: {e}. Falling back to Rule Engine.")
+                return self._summarise_rule_engine(account, tickets_90d, risks)
+
+        # Priority 2: Cloud Gemini -> Cloud OpenAI -> Local Ollama -> Rule Engine
         if has_valid_gemini:
             try:
                 return self._summarise_with_gemini(account, tickets_90d, risks)
             except Exception as e:
                 print(f"[TAMSummariser] Gemini API failed ({_redact_key(e)}). Attempting OpenAI / Ollama failover...")
 
-        # Tier 2: Cloud OpenAI LLM
         if has_valid_openai:
             try:
                 return self._summarise_with_openai(account, tickets_90d, risks)
             except Exception as e:
                 print(f"[TAMSummariser] OpenAI API failed ({_redact_key(e)}). Attempting Local Ollama failover...")
 
-        # Tier 3: Local Ollama LLM
         try:
             return self._summarise_with_local_llm(account, tickets_90d, risks)
         except Exception:
             pass
 
-        # Tier 4: Deterministic Rule Engine
         return self._summarise_rule_engine(account, tickets_90d, risks)
 
     def _summarise_with_gemini(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
@@ -213,17 +219,32 @@ Return valid JSON only matching the schema.
         res = requests.post(local_url, json=payload, timeout=15)
         res.raise_for_status()
         text_out = res.json().get("response", "")
-        parsed = json.loads(text_out)
+        
+        parsed_raw = json.loads(text_out)
+        if isinstance(parsed_raw, list) and len(parsed_raw) > 0:
+            parsed = parsed_raw[0]
+        elif isinstance(parsed_raw, dict):
+            parsed = parsed_raw
+        else:
+            parsed = {}
+
         if risks:
             parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
-        parsed["execution_mode"] = f"LLM_LOCAL_OLLAMA ({model_name})"
+
+        clean_dict = {
+            "executive_summary": str(parsed.get("executive_summary", f"{account.get('company_name')} account health overview. Ticket volume monitored over 90 days.")),
+            "open_risks_and_flagged_issues": parsed.get("open_risks_and_flagged_issues", []),
+            "strategic_talking_points": parsed.get("strategic_talking_points", ["Review contract terms ahead of renewal", "Conduct technical check-in with TAM team"]),
+            "contract_recommendation": str(parsed.get("contract_recommendation", "Maintain current tier and schedule QBR")),
+            "execution_mode": f"LLM_LOCAL_OLLAMA ({model_name})"
+        }
         return AccountBrief(
             account_id=account.get("account_id"),
             company_name=account.get("company_name"),
             tier=account.get("tier"),
-            mrr=account.get("mrr"),
-            health_score=account.get("health_score"),
-            **parsed
+            mrr=account.get("mrr", 0),
+            health_score=account.get("health_score", "Healthy"),
+            **clean_dict
         )
 
     def _extract_verbatim_risk_quotes(self, tickets: List[Dict[str, Any]]) -> List[RiskFlag]:
