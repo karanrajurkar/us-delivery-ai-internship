@@ -337,7 +337,7 @@ with st.sidebar:
     llm_engine_choice = st.selectbox(
         "Select Provider Target:",
         [
-            "🟢 Cloud Gemini (gemini-1.5-flash)",
+            "🟢 Cloud Gemini (gemini-3.6-flash)",
             "🟢 Cloud OpenAI (gpt-4o-mini)",
             "🦙 Local Ollama LLM (tinyllama / 100% Free)",
             "⚙️ Local Deterministic Rule Engine"

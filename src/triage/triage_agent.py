@@ -87,7 +87,7 @@ class TicketTriageAgent:
 
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
-        has_valid_gemini = len(gemini_key) > 10 and gemini_key.startswith("AIzaSy")
+        has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith(("your_", "YOUR_"))
         has_valid_openai = len(openai_key) > 10 and (openai_key.startswith("sk-") or not openai_key.startswith("your_"))
 
         # Explicit Rule Engine choice
@@ -166,7 +166,7 @@ class TicketTriageAgent:
     def _triage_with_gemini(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
         import requests
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
-        model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+        model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
         headers = {"Content-Type": "application/json"}
         prompt = f"Ticket Subject: {subject}\nTicket Body: {body}\nMatched KB: {matched_kb}\nKB Context: {kb_context[:500]}"
