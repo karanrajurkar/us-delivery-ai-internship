@@ -121,7 +121,7 @@ KB Context Snippet:
             res = None
             for attempt in range(2):
                 _throttle_gemini_api()
-                res = requests.post(url, headers=headers, json=payload, timeout=10)
+                res = requests.post(url, headers=headers, json=payload, timeout=30)
                 if res.status_code in (400, 401, 403):
                     # Non-retryable key/auth error - break immediately
                     break

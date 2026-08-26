@@ -8,16 +8,16 @@
 
 | Task | Test ID | Description | Type | Result | Score | Latency (s) |
 |---|---|---|---|---|---|---|
-| Task 1: Ticket Triage | `T1_TEST_1` | Standard Authentication SSO lockout ticket | Standard | ✅ PASS | **1.0** | 2.129s |
-| Task 1: Ticket Triage | `T1_TEST_2` | API Rate Limit 429 error during migration | Standard | ✅ PASS | **0.8** | 0.9014s |
-| Task 1: Ticket Triage | `T1_TEST_3` | Webhook HMAC signature verification failing | Standard | ✅ PASS | **1.0** | 1.298s |
-| Task 1: Ticket Triage | `T1_TEST_4` | General payment portal query | Standard | ✅ PASS | **1.0** | 1.3999s |
-| Task 1: Ticket Triage | `T1_TEST_5_ADV` | Adversarial: Highly ambiguous multi-issue ticket (Billing dispute + Database outage) | Adversarial | ✅ PASS | **1.0** | 0.6176s |
-| Task 2: Account Health Summariser | `T2_TEST_1` | Account ACC-001 with high churn risk tickets | Standard | ✅ PASS | **1.0** | 6.5391s |
-| Task 2: Account Health Summariser | `T2_TEST_2` | Pro tier account ACC-004 health summary check | Standard | ✅ PASS | **1.0** | 6.5345s |
-| Task 2: Account Health Summariser | `T2_TEST_3` | Determinism verification: duplicate run check on ACC-001 | Standard | ✅ PASS | **1.0** | 6.4999s |
-| Task 2: Account Health Summariser | `T2_TEST_4` | Enterprise tier account ACC-005 ticket history check | Standard | ✅ PASS | **1.0** | 6.7204s |
-| Task 2: Account Health Summariser | `T2_TEST_5_ADV` | Adversarial: Non-existent account ID 'ACC-99999' | Adversarial | ✅ PASS | **0.85** | 0.0s |
+| Task 1: Ticket Triage | `T1_TEST_1` | Standard Authentication SSO lockout ticket | Standard | ✅ PASS | **1.0** | 10.3404s |
+| Task 1: Ticket Triage | `T1_TEST_2` | API Rate Limit 429 error during migration | Standard | ✅ PASS | **0.8** | 10.2802s |
+| Task 1: Ticket Triage | `T1_TEST_3` | Webhook HMAC signature verification failing | Standard | ✅ PASS | **1.0** | 10.2594s |
+| Task 1: Ticket Triage | `T1_TEST_4` | General payment portal query | Standard | ✅ PASS | **1.0** | 9.8922s |
+| Task 1: Ticket Triage | `T1_TEST_5_ADV` | Adversarial: Highly ambiguous multi-issue ticket (Billing dispute + Database outage) | Adversarial | ✅ PASS | **1.0** | 10.0608s |
+| Task 2: Account Health Summariser | `T2_TEST_1` | Account ACC-001 with high churn risk tickets | Standard | ✅ PASS | **1.0** | 10.4401s |
+| Task 2: Account Health Summariser | `T2_TEST_2` | Pro tier account ACC-004 health summary check | Standard | ✅ PASS | **1.0** | 10.3798s |
+| Task 2: Account Health Summariser | `T2_TEST_3` | Determinism verification: duplicate run check on ACC-001 | Standard | ✅ PASS | **1.0** | 10.4028s |
+| Task 2: Account Health Summariser | `T2_TEST_4` | Enterprise tier account ACC-005 ticket history check | Standard | ✅ PASS | **1.0** | 10.3383s |
+| Task 2: Account Health Summariser | `T2_TEST_5_ADV` | Adversarial: Non-existent account ID 'ACC-99999' | Adversarial | ✅ PASS | **0.85** | 0.0058s |
 
 ## Detailed Test Logs
 ### `T1_TEST_1` - Standard Authentication SSO lockout ticket
@@ -78,10 +78,10 @@
 - **Reasoning / Notes:** All criteria satisfied.
 - **Output Snippet:** ```json
 {
-  "product_area": "Billing & Invoicing",
-  "urgency_tier": "P2",
+  "product_area": "Infrastructure & Performance",
+  "urgency_tier": "P1",
   "matched_kb_doc": "infrastructure.md",
-  "recommended_team": "Billing Ops"
+  "recommended_team": "Tier 2 Engineering"
 }
 ```
 
