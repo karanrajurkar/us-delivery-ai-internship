@@ -86,9 +86,10 @@ class TicketTriageAgent:
         # Step 2: LLM API or Local Rule Engine Classification
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
-        has_valid_key = gemini_key.startswith("AIzaSy") or openai_key.startswith("sk-")
+        has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
+        has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
 
-        if has_valid_key:
+        if has_valid_gemini or has_valid_openai:
             try:
                 return self._triage_with_llm(subject, body, matched_kb, kb_score, kb_context)
             except Exception as e:
@@ -109,8 +110,8 @@ KB Context Snippet:
 {kb_context[:500]}
 """
 
-        if gemini_key.startswith("AIzaSy"):
-            model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+        if len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_"):
+            model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
             headers = {"Content-Type": "application/json"}
             payload = {

@@ -84,9 +84,10 @@ class TAMAccountSummariser:
 
         gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
         openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
-        has_valid_key = gemini_key.startswith("AIzaSy") or openai_key.startswith("sk-")
+        has_valid_gemini = len(gemini_key) > 10 and not gemini_key.startswith("your_") and not gemini_key.startswith("YOUR_")
+        has_valid_openai = len(openai_key) > 10 and not openai_key.startswith("your_") and not openai_key.startswith("YOUR_")
 
-        if has_valid_key:
+        if has_valid_gemini or has_valid_openai:
             try:
                 return self._summarise_with_llm(account, tickets_90d, risks)
             except Exception as e:
