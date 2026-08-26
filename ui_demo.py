@@ -628,13 +628,25 @@ with tab2:
         with st.container(border=True):
             if btn_brief:
                 with st.spinner("Executing multi-document context synthesis and auditing churn risk quotes..."):
+                    if "Gemini" in llm_engine_choice:
+                        os.environ["PREFERRED_LLM_PROVIDER"] = "gemini"
+                        os.environ["USE_LOCAL_LLM"] = "false"
+                    elif "OpenAI" in llm_engine_choice:
+                        os.environ["PREFERRED_LLM_PROVIDER"] = "openai"
+                        os.environ["USE_LOCAL_LLM"] = "false"
+                    elif "Ollama" in llm_engine_choice:
+                        os.environ["PREFERRED_LLM_PROVIDER"] = "ollama"
+                        os.environ["USE_LOCAL_LLM"] = "true"
+                    elif "Rule Engine" in llm_engine_choice:
+                        os.environ["PREFERRED_LLM_PROVIDER"] = "rule_engine"
+                        os.environ["USE_LOCAL_LLM"] = "false"
+
                     active_summariser = TAMAccountSummariser(loader=loader)
                     brief = active_summariser.summarise_account(selected_acc_id)
                 
                 st.markdown(f"### 📄 QBR Executive Brief: **{brief.company_name}**")
                 
                 b_exec_mode = getattr(brief, "execution_mode", "RULE_ENGINE_FALLBACK")
-                b_has_key = bool((os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip())
                 if b_exec_mode == "LLM_GEMINI":
                     b_mode_label = "🟢 🤖 Live Gemini LLM API"
                     b_mode_color = "#34D399"
@@ -642,14 +654,24 @@ with tab2:
                     b_mode_label = "🟢 🤖 Live OpenAI LLM API"
                     b_mode_color = "#34D399"
                 elif "LOCAL_OLLAMA" in b_exec_mode:
-                    b_mode_label = f"🟢 🦙 {b_exec_mode} (Offline / Free)"
-                    b_mode_color = "#38BDF8"
-                elif b_has_key:
-                    b_mode_label = "🟡 ⚙️ Local Rule Engine (Quota Limit / API Failover)"
-                    b_mode_color = "#FBBF24"
+                    if "[Fallback:" in b_exec_mode:
+                        reason = b_exec_mode.split("[Fallback:")[1].rstrip("]")
+                        b_mode_label = f"🟡 🦙 Local Ollama Fallback (Reason: {reason})"
+                        b_mode_color = "#FBBF24"
+                    else:
+                        b_mode_label = f"🟢 🦙 {b_exec_mode} (Offline / Free)"
+                        b_mode_color = "#38BDF8"
+                elif "RULE_ENGINE_FALLBACK" in b_exec_mode:
+                    if "[Fallback:" in b_exec_mode:
+                        reason = b_exec_mode.split("[Fallback:")[1].rstrip("]")
+                        b_mode_label = f"🟡 ⚙️ Local Rule Engine (Reason: {reason})"
+                        b_mode_color = "#FBBF24"
+                    else:
+                        b_mode_label = "⚙️ Local Deterministic Rule Engine"
+                        b_mode_color = "#94A3B8"
                 else:
-                    b_mode_label = "⚙️ Local Rule Engine Fallback (No API Key Provided)"
-                    b_mode_color = "#F59E0B"
+                    b_mode_label = f"⚙️ {b_exec_mode}"
+                    b_mode_color = "#FBBF24"
                 
                 st.markdown(
                     f"""
