@@ -36,35 +36,47 @@ Production-grade, LLM-powered internal AI platform built for Technical Support (
 
 ## 🚀 Quickstart & Setup
 
-### Prerequisites
+### Option A: ⚡ 1-Click Automated Launcher (Easiest)
+Simply run the 1-click launcher script for your OS (automates `.env` template creation, dependency check, data setup, evaluation harness, and launches the Streamlit UI):
+
+* **Windows**: Double-click [`run.bat`](run.bat) or run in terminal:
+  ```powershell
+  .\run.bat
+  ```
+* **Linux / macOS**: Run in terminal:
+  ```bash
+  chmod +x run.sh
+  ./run.sh
+  ```
+
+---
+
+### Option B: Manual Setup & Execution
+
+#### 1. Prerequisites & Installation
 - Python 3.10+
-- Set API key in `.env` (copy from `.env.example`):
+- Configure API key in `.env` (copied from `.env.example`):
   ```bash
   cp .env.example .env
   # Add your GEMINI_API_KEY or OPENAI_API_KEY
   ```
+- Install dependencies:
+  ```bash
+  pip install -r requirements.txt
+  ```
 
-### Installation
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 💻 Running the System (Single Entry-Point Command)
-
-To run data initialization, execute the full evaluation harness, and view system results with a single command:
-
+#### 2. Running the System (Single Entry-Point Command)
+To run data initialization, execute the full evaluation harness, and view system results:
 ```bash
 python main.py
 ```
 
-### Additional Commands & Options:
-- **Run Evaluation Harness**: `python main.py --eval`
-- **Start FastAPI REST Server**: `python main.py --server` (Server runs on `http://localhost:8000`)
+#### 3. Additional Execution Commands & Options
+- **Launch Interactive Streamlit UI**: `streamlit run ui_demo.py`
+- **Start FastAPI REST Server**: `python main.py --server` *(Runs on `http://localhost:8000`)*
+- **Run Evaluation Harness Only**: `python main.py --eval`
 - **Run Sample Ticket Triage**: `python main.py --triage-sample`
 - **Run Sample TAM Account Brief**: `python main.py --summarise-sample`
-- **Launch Interactive Streamlit UI**: `streamlit run ui_demo.py`
 
 ---
 
