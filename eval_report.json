@@ -1,0 +1,172 @@
+{
+  "total_test_cases": 10,
+  "passed_count": 10,
+  "avg_quality_score": 0.97,
+  "test_cases": [
+    {
+      "task_name": "Task 1: Ticket Triage",
+      "test_id": "T1_TEST_1",
+      "description": "Standard Authentication SSO lockout ticket",
+      "is_adversarial": false,
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 0.005,
+      "output_snippet": {
+        "product_area": "Authentication",
+        "urgency_tier": "P1",
+        "matched_kb_doc": "auth.md",
+        "recommended_team": "Security Ops"
+      }
+    },
+    {
+      "task_name": "Task 1: Ticket Triage",
+      "test_id": "T1_TEST_2",
+      "description": "API Rate Limit 429 error during migration",
+      "is_adversarial": false,
+      "passed": true,
+      "quality_score": 0.8,
+      "reasoning": "Expected urgency 'P1', got 'P2'",
+      "latency_seconds": 0.0,
+      "output_snippet": {
+        "product_area": "API Integration",
+        "urgency_tier": "P2",
+        "matched_kb_doc": "api.md",
+        "recommended_team": "Tier 2 Engineering"
+      }
+    },
+    {
+      "task_name": "Task 1: Ticket Triage",
+      "test_id": "T1_TEST_3",
+      "description": "Webhook HMAC signature verification failing",
+      "is_adversarial": false,
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 0.0081,
+      "output_snippet": {
+        "product_area": "Webhooks",
+        "urgency_tier": "P3",
+        "matched_kb_doc": "api.md",
+        "recommended_team": "Tier 1 Support"
+      }
+    },
+    {
+      "task_name": "Task 1: Ticket Triage",
+      "test_id": "T1_TEST_4",
+      "description": "General payment portal query",
+      "is_adversarial": false,
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 0.0047,
+      "output_snippet": {
+        "product_area": "Billing & Invoicing",
+        "urgency_tier": "P4",
+        "matched_kb_doc": "billing.md",
+        "recommended_team": "Billing Ops"
+      }
+    },
+    {
+      "task_name": "Task 1: Ticket Triage",
+      "test_id": "T1_TEST_5_ADV",
+      "description": "Adversarial: Highly ambiguous multi-issue ticket (Billing dispute + Database outage)",
+      "is_adversarial": true,
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 0.0,
+      "output_snippet": {
+        "product_area": "Billing & Invoicing",
+        "urgency_tier": "P2",
+        "matched_kb_doc": "infrastructure.md",
+        "recommended_team": "Billing Ops"
+      }
+    },
+    {
+      "task_name": "Task 2: Account Health Summariser",
+      "test_id": "T2_TEST_1",
+      "description": "Account ACC-001 with high churn risk tickets",
+      "is_adversarial": false,
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 0.0,
+      "output_snippet": {
+        "account_id": "ACC-001",
+        "company_name": "Acme Corp",
+        "exec_summary_sentences": 4,
+        "risk_flag_count": 6,
+        "talking_points_count": 4
+      }
+    },
+    {
+      "task_name": "Task 2: Account Health Summariser",
+      "test_id": "T2_TEST_2",
+      "description": "Pro tier account ACC-004 health summary check",
+      "is_adversarial": false,
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 0.0,
+      "output_snippet": {
+        "account_id": "ACC-004",
+        "company_name": "CyberShield Inc",
+        "exec_summary_sentences": 4,
+        "risk_flag_count": 13,
+        "talking_points_count": 4
+      }
+    },
+    {
+      "task_name": "Task 2: Account Health Summariser",
+      "test_id": "T2_TEST_3",
+      "description": "Determinism verification: duplicate run check on ACC-001",
+      "is_adversarial": false,
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 0.0039,
+      "output_snippet": {
+        "account_id": "ACC-001",
+        "company_name": "Acme Corp",
+        "exec_summary_sentences": 4,
+        "risk_flag_count": 6,
+        "talking_points_count": 4
+      }
+    },
+    {
+      "task_name": "Task 2: Account Health Summariser",
+      "test_id": "T2_TEST_4",
+      "description": "Enterprise tier account ACC-005 ticket history check",
+      "is_adversarial": false,
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 0.0,
+      "output_snippet": {
+        "account_id": "ACC-005",
+        "company_name": "DataDynamics",
+        "exec_summary_sentences": 4,
+        "risk_flag_count": 12,
+        "talking_points_count": 4
+      }
+    },
+    {
+      "task_name": "Task 2: Account Health Summariser",
+      "test_id": "T2_TEST_5_ADV",
+      "description": "Adversarial: Non-existent account ID 'ACC-99999'",
+      "is_adversarial": true,
+      "passed": true,
+      "quality_score": 0.85,
+      "reasoning": "Exec summary sentence count is 2 (expected 3-5)",
+      "latency_seconds": 0.0,
+      "output_snippet": {
+        "account_id": "ACC-99999",
+        "company_name": "Unknown Account",
+        "exec_summary_sentences": 2,
+        "risk_flag_count": 1,
+        "talking_points_count": 2
+      }
+    }
+  ]
+}

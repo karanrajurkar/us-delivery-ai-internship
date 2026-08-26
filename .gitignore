@@ -1,0 +1,19 @@
+# Environment variables
+.env
+*.env
+
+# Python bytecode & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+
+# Testing & Eval reports
+.pytest_cache/
+*.log

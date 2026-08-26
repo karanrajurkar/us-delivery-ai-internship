@@ -1,0 +1,502 @@
+[
+  {
+    "account_id": "ACC-001",
+    "company_name": "Acme Corp",
+    "tier": "Enterprise",
+    "mrr": 51277,
+    "health_score": "Healthy",
+    "primary_contact": "contact@acmecorp.com",
+    "contract_end_date": "2026-11-28",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-002",
+    "company_name": "Apex Technologies",
+    "tier": "Enterprise",
+    "mrr": 27432,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@apextechnologies.com",
+    "contract_end_date": "2027-05-30",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-003",
+    "company_name": "BlueSky Cloud",
+    "tier": "Enterprise",
+    "mrr": 70736,
+    "health_score": "Critical",
+    "primary_contact": "contact@blueskycloud.com",
+    "contract_end_date": "2026-12-15",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-004",
+    "company_name": "CyberShield Inc",
+    "tier": "Enterprise",
+    "mrr": 40496,
+    "health_score": "Critical",
+    "primary_contact": "contact@cybershieldinc.com",
+    "contract_end_date": "2027-06-07",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-005",
+    "company_name": "DataDynamics",
+    "tier": "Enterprise",
+    "mrr": 27358,
+    "health_score": "Healthy",
+    "primary_contact": "contact@datadynamics.com",
+    "contract_end_date": "2027-05-16",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-006",
+    "company_name": "Echo Systems",
+    "tier": "Pro",
+    "mrr": 7116,
+    "health_score": "Critical",
+    "primary_contact": "contact@echosystems.com",
+    "contract_end_date": "2027-01-10",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-007",
+    "company_name": "FinTech Global",
+    "tier": "Pro",
+    "mrr": 6060,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@fintechglobal.com",
+    "contract_end_date": "2027-08-14",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-008",
+    "company_name": "GlobalLogistics",
+    "tier": "Pro",
+    "mrr": 8601,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@globallogistics.com",
+    "contract_end_date": "2027-02-09",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-009",
+    "company_name": "HyperScale AI",
+    "tier": "Pro",
+    "mrr": 5901,
+    "health_score": "Healthy",
+    "primary_contact": "contact@hyperscaleai.com",
+    "contract_end_date": "2026-12-02",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-010",
+    "company_name": "Innovate Tech",
+    "tier": "Pro",
+    "mrr": 8497,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@innovatetech.com",
+    "contract_end_date": "2026-12-30",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-011",
+    "company_name": "Jupiter Financial",
+    "tier": "Pro",
+    "mrr": 9292,
+    "health_score": "Critical",
+    "primary_contact": "contact@jupiterfinancial.com",
+    "contract_end_date": "2027-07-19",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-012",
+    "company_name": "Krypton Labs",
+    "tier": "Enterprise",
+    "mrr": 52384,
+    "health_score": "Healthy",
+    "primary_contact": "contact@kryptonlabs.com",
+    "contract_end_date": "2027-06-16",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-013",
+    "company_name": "Lunar Commerce",
+    "tier": "Enterprise",
+    "mrr": 32501,
+    "health_score": "Critical",
+    "primary_contact": "contact@lunarcommerce.com",
+    "contract_end_date": "2026-10-17",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-014",
+    "company_name": "Matrix Digital",
+    "tier": "Enterprise",
+    "mrr": 77829,
+    "health_score": "Critical",
+    "primary_contact": "contact@matrixdigital.com",
+    "contract_end_date": "2027-07-16",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-015",
+    "company_name": "Nova Solutions",
+    "tier": "Starter",
+    "mrr": 772,
+    "health_score": "Healthy",
+    "primary_contact": "contact@novasolutions.com",
+    "contract_end_date": "2027-05-11",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-016",
+    "company_name": "Omni Health",
+    "tier": "Starter",
+    "mrr": 826,
+    "health_score": "Healthy",
+    "primary_contact": "contact@omnihealth.com",
+    "contract_end_date": "2026-12-16",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-017",
+    "company_name": "Pinnacle Networks",
+    "tier": "Enterprise",
+    "mrr": 77917,
+    "health_score": "Healthy",
+    "primary_contact": "contact@pinnaclenetworks.com",
+    "contract_end_date": "2027-05-19",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-018",
+    "company_name": "Quantum Compute",
+    "tier": "Pro",
+    "mrr": 8589,
+    "health_score": "Healthy",
+    "primary_contact": "contact@quantumcompute.com",
+    "contract_end_date": "2027-05-07",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-019",
+    "company_name": "Radius Retail",
+    "tier": "Starter",
+    "mrr": 2435,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@radiusretail.com",
+    "contract_end_date": "2026-12-05",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-020",
+    "company_name": "Starlight Media",
+    "tier": "Pro",
+    "mrr": 6502,
+    "health_score": "Healthy",
+    "primary_contact": "contact@starlightmedia.com",
+    "contract_end_date": "2027-02-27",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-021",
+    "company_name": "Titan Security",
+    "tier": "Enterprise",
+    "mrr": 50053,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@titansecurity.com",
+    "contract_end_date": "2026-10-06",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-022",
+    "company_name": "Ultra Data",
+    "tier": "Enterprise",
+    "mrr": 58071,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@ultradata.com",
+    "contract_end_date": "2026-10-12",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-023",
+    "company_name": "Vortex Software",
+    "tier": "Starter",
+    "mrr": 1729,
+    "health_score": "Healthy",
+    "primary_contact": "contact@vortexsoftware.com",
+    "contract_end_date": "2027-01-30",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-024",
+    "company_name": "Wave Telecom",
+    "tier": "Pro",
+    "mrr": 5946,
+    "health_score": "Healthy",
+    "primary_contact": "contact@wavetelecom.com",
+    "contract_end_date": "2027-03-18",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-025",
+    "company_name": "Zenith Enterprise",
+    "tier": "Starter",
+    "mrr": 976,
+    "health_score": "Healthy",
+    "primary_contact": "contact@zenithenterprise.com",
+    "contract_end_date": "2027-03-24",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-026",
+    "company_name": "Company 26 Inc",
+    "tier": "Starter",
+    "mrr": 1245,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company26inc.com",
+    "contract_end_date": "2027-05-28",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-027",
+    "company_name": "Company 27 Inc",
+    "tier": "Starter",
+    "mrr": 2038,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company27inc.com",
+    "contract_end_date": "2026-10-21",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-028",
+    "company_name": "Company 28 Inc",
+    "tier": "Enterprise",
+    "mrr": 74364,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company28inc.com",
+    "contract_end_date": "2027-04-07",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-029",
+    "company_name": "Company 29 Inc",
+    "tier": "Enterprise",
+    "mrr": 83380,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company29inc.com",
+    "contract_end_date": "2026-11-10",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-030",
+    "company_name": "Company 30 Inc",
+    "tier": "Enterprise",
+    "mrr": 69015,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company30inc.com",
+    "contract_end_date": "2027-04-22",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-031",
+    "company_name": "Company 31 Inc",
+    "tier": "Starter",
+    "mrr": 842,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company31inc.com",
+    "contract_end_date": "2027-05-12",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-032",
+    "company_name": "Company 32 Inc",
+    "tier": "Pro",
+    "mrr": 4870,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company32inc.com",
+    "contract_end_date": "2027-02-15",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-033",
+    "company_name": "Company 33 Inc",
+    "tier": "Starter",
+    "mrr": 2330,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company33inc.com",
+    "contract_end_date": "2027-01-30",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-034",
+    "company_name": "Company 34 Inc",
+    "tier": "Pro",
+    "mrr": 11796,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company34inc.com",
+    "contract_end_date": "2027-07-12",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-035",
+    "company_name": "Company 35 Inc",
+    "tier": "Starter",
+    "mrr": 2140,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company35inc.com",
+    "contract_end_date": "2027-05-16",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-036",
+    "company_name": "Company 36 Inc",
+    "tier": "Starter",
+    "mrr": 1442,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company36inc.com",
+    "contract_end_date": "2027-05-06",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-037",
+    "company_name": "Company 37 Inc",
+    "tier": "Starter",
+    "mrr": 1236,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company37inc.com",
+    "contract_end_date": "2027-07-12",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-038",
+    "company_name": "Company 38 Inc",
+    "tier": "Enterprise",
+    "mrr": 55502,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company38inc.com",
+    "contract_end_date": "2027-06-28",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-039",
+    "company_name": "Company 39 Inc",
+    "tier": "Enterprise",
+    "mrr": 61055,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company39inc.com",
+    "contract_end_date": "2027-07-10",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-040",
+    "company_name": "Company 40 Inc",
+    "tier": "Starter",
+    "mrr": 1898,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company40inc.com",
+    "contract_end_date": "2027-08-23",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-041",
+    "company_name": "Company 41 Inc",
+    "tier": "Enterprise",
+    "mrr": 82157,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company41inc.com",
+    "contract_end_date": "2027-01-28",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-042",
+    "company_name": "Company 42 Inc",
+    "tier": "Enterprise",
+    "mrr": 21702,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company42inc.com",
+    "contract_end_date": "2027-01-27",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-043",
+    "company_name": "Company 43 Inc",
+    "tier": "Starter",
+    "mrr": 750,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company43inc.com",
+    "contract_end_date": "2026-12-31",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-044",
+    "company_name": "Company 44 Inc",
+    "tier": "Starter",
+    "mrr": 1801,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company44inc.com",
+    "contract_end_date": "2027-08-03",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-045",
+    "company_name": "Company 45 Inc",
+    "tier": "Pro",
+    "mrr": 10810,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company45inc.com",
+    "contract_end_date": "2026-10-04",
+    "tam_assigned": "TAM_5"
+  },
+  {
+    "account_id": "ACC-046",
+    "company_name": "Company 46 Inc",
+    "tier": "Enterprise",
+    "mrr": 49711,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company46inc.com",
+    "contract_end_date": "2027-08-23",
+    "tam_assigned": "TAM_1"
+  },
+  {
+    "account_id": "ACC-047",
+    "company_name": "Company 47 Inc",
+    "tier": "Starter",
+    "mrr": 2003,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company47inc.com",
+    "contract_end_date": "2027-02-16",
+    "tam_assigned": "TAM_2"
+  },
+  {
+    "account_id": "ACC-048",
+    "company_name": "Company 48 Inc",
+    "tier": "Enterprise",
+    "mrr": 60668,
+    "health_score": "Healthy",
+    "primary_contact": "contact@company48inc.com",
+    "contract_end_date": "2027-06-22",
+    "tam_assigned": "TAM_3"
+  },
+  {
+    "account_id": "ACC-049",
+    "company_name": "Company 49 Inc",
+    "tier": "Enterprise",
+    "mrr": 83671,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company49inc.com",
+    "contract_end_date": "2027-07-22",
+    "tam_assigned": "TAM_4"
+  },
+  {
+    "account_id": "ACC-050",
+    "company_name": "Company 50 Inc",
+    "tier": "Starter",
+    "mrr": 1159,
+    "health_score": "At-Risk",
+    "primary_contact": "contact@company50inc.com",
+    "contract_end_date": "2026-12-19",
+    "tam_assigned": "TAM_5"
+  }
+]
