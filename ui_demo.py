@@ -416,6 +416,20 @@ with tab1:
                     elapsed = time.time() - start_time
                 
                 st.success(f"✨ Triage Execution Completed in **{elapsed:.3f} seconds**")
+
+                mode_label = "🤖 Live Gemini LLM API" if res.execution_mode == "LLM_GEMINI" else ("🤖 Live OpenAI LLM API" if res.execution_mode == "LLM_OPENAI" else "⚙️ Local Rule Engine Fallback (No API Key)")
+                mode_color = "#34D399" if "LLM" in res.execution_mode else "#FBBF24"
+                
+                st.markdown(
+                    f"""
+                    <div style="margin-bottom: 14px;">
+                        <span style="background: rgba(15, 23, 42, 0.8); border: 1px solid {mode_color}; color: {mode_color}; padding: 4px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            {mode_label}
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
             
                 # Urgency Badge Rendering
                 urg_class = f"badge-{res.urgency_tier.lower()}"
@@ -549,6 +563,21 @@ with tab2:
                     brief = account_summariser.summarise_account(selected_acc_id)
                 
                 st.markdown(f"### 📄 QBR Executive Brief: **{brief.company_name}**")
+                
+                b_mode_label = "🤖 Live Gemini LLM API" if brief.execution_mode == "LLM_GEMINI" else ("🤖 Live OpenAI LLM API" if brief.execution_mode == "LLM_OPENAI" else "⚙️ Local Rule Engine Fallback (No API Key)")
+                b_mode_color = "#34D399" if "LLM" in brief.execution_mode else "#FBBF24"
+                
+                st.markdown(
+                    f"""
+                    <div style="margin: 8px 0 12px 0;">
+                        <span style="background: rgba(15, 23, 42, 0.8); border: 1px solid {b_mode_color}; color: {b_mode_color}; padding: 4px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            {b_mode_label}
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+                
                 st.caption(f"Generated with deterministic seed pin (`temperature=0.0`) • Prompt Version: `{brief.prompt_version}`")
                 st.markdown("---")
             

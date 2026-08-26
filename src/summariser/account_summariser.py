@@ -22,6 +22,7 @@ class AccountBrief(BaseModel):
     open_risks_and_flagged_issues: List[RiskFlag] = Field(default_factory=list, description="List of flagged risks with verbatim quotes")
     recommended_talking_points: List[str] = Field(default_factory=list, description="Actionable points for TAM during QBR")
     prompt_version: str = Field(default=SUMMARISER_PROMPT_VERSION)
+    execution_mode: str = Field(default="RULE_ENGINE_FALLBACK", description="Execution mode: 'LLM_GEMINI', 'LLM_OPENAI', or 'RULE_ENGINE_FALLBACK'")
 
 class TAMAccountSummariser:
     def __init__(self, loader: Optional[DataLoader] = None):
@@ -49,7 +50,8 @@ class TAMAccountSummariser:
                 recommended_talking_points=[
                     "Verify customer account ID in primary billing database.",
                     "Ensure CRM sync is active for newly onboarded tenants."
-                ]
+                ],
+                execution_mode="RULE_ENGINE_FALLBACK"
             )
 
         tickets_90d = self.loader.get_account_tickets(account_id, days=90)
@@ -132,6 +134,7 @@ Recent 90-Day Ticket History:
             if risks:
                 parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
                 
+            parsed["execution_mode"] = "LLM_GEMINI"
             return AccountBrief(
                 account_id=account.get("account_id"),
                 company_name=account.get("company_name"),
@@ -159,6 +162,7 @@ Recent 90-Day Ticket History:
             parsed = json.loads(text_out)
             if risks:
                 parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
+            parsed["execution_mode"] = "LLM_OPENAI"
             return AccountBrief(
                 account_id=account.get("account_id"),
                 company_name=account.get("company_name"),
@@ -179,7 +183,6 @@ Recent 90-Day Ticket History:
         acc_id = account.get("account_id", "")
         
         open_tickets = [t for t in tickets if t.get("status") in ["Open", "Pending Engineer"]]
-        p1_count = sum(1 for t in tickets if "URGENT" in t.get("subject", "") or "P1" in t.get("body", ""))
         
         # 3-5 sentence Executive Summary
         exec_summary = (
@@ -207,7 +210,8 @@ Recent 90-Day Ticket History:
             health_score=h_score,
             executive_summary=exec_summary,
             open_risks_and_flagged_issues=risks,
-            recommended_talking_points=talking_points[:4]
+            recommended_talking_points=talking_points[:4],
+            execution_mode="RULE_ENGINE_FALLBACK"
         )
 
 # Callable Python function required by spec

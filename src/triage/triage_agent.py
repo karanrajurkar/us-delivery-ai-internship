@@ -22,6 +22,7 @@ class TriageOutput(BaseModel):
     recommended_team: str = Field(description="Target internal team (Tier 1 Support, Tier 2 Engineering, Billing Ops, Security Ops, TAM Escalation)")
     draft_response: str = Field(description="Suggested draft first response for support agent")
     prompt_version: str = Field(default=TRIAGE_PROMPT_VERSION)
+    execution_mode: str = Field(default="RULE_ENGINE_FALLBACK", description="Execution mode: 'LLM_GEMINI', 'LLM_OPENAI', or 'RULE_ENGINE_FALLBACK'")
 
 class TicketTriageAgent:
     def __init__(self, retriever: Optional[KBRetriever] = None):
@@ -94,6 +95,7 @@ KB Context Snippet:
             parsed = json.loads(text_out)
             parsed["matched_kb_doc"] = matched_kb
             parsed["kb_relevance_score"] = round(kb_score, 3)
+            parsed["execution_mode"] = "LLM_GEMINI"
             return TriageOutput(**parsed)
         elif openai_key:
             url = "https://api.openai.com/v1/chat/completions"
@@ -113,6 +115,7 @@ KB Context Snippet:
             parsed = json.loads(text_out)
             parsed["matched_kb_doc"] = matched_kb
             parsed["kb_relevance_score"] = round(kb_score, 3)
+            parsed["execution_mode"] = "LLM_OPENAI"
             return TriageOutput(**parsed)
 
         return self._triage_rule_engine(subject, body, matched_kb, kb_score)
@@ -186,7 +189,8 @@ KB Context Snippet:
             matched_kb_doc=matched_kb,
             kb_relevance_score=round(kb_score, 3),
             recommended_team=team,
-            draft_response=draft
+            draft_response=draft,
+            execution_mode="RULE_ENGINE_FALLBACK"
         )
 
 # Module function shortcut required by spec
