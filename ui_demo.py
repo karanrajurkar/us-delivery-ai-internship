@@ -339,7 +339,7 @@ with st.sidebar:
         [
             "🟢 Cloud Gemini (gemini-3.6-flash)",
             "🟢 Cloud OpenAI (gpt-4o-mini)",
-            "🦙 Local Ollama LLM (llama3.2 / 100% Free)",
+            "🦙 Local Ollama LLM (tinyllama / 100% Free)",
             "⚙️ Local Deterministic Rule Engine"
         ],
         index=0,
