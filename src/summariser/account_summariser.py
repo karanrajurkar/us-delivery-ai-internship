@@ -183,7 +183,7 @@ class TAMAccountSummariser:
     def _summarise_with_local_llm(self, account: Dict[str, Any], tickets: List[Dict[str, Any]], risks: List[RiskFlag]) -> AccountBrief:
         import requests
         local_url = os.getenv("LOCAL_LLM_URL", "http://localhost:11434/api/generate").strip()
-        model_name = os.getenv("LOCAL_LLM_MODEL", "llama3.2").strip()
+        model_name = os.getenv("LOCAL_LLM_MODEL", "tinyllama").strip()
         
         t_summary = f"Total 90d Tickets: {len(tickets)}.\n"
         for t in tickets[:10]:

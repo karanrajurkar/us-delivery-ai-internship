@@ -168,7 +168,7 @@ class TicketTriageAgent:
     def _triage_with_local_llm(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
         import requests
         local_url = os.getenv("LOCAL_LLM_URL", "http://localhost:11434/api/generate").strip()
-        model_name = os.getenv("LOCAL_LLM_MODEL", "llama3.2").strip()
+        model_name = os.getenv("LOCAL_LLM_MODEL", "tinyllama").strip()
         
         prompt = f"""{TRIAGE_SYSTEM_PROMPT}
 
