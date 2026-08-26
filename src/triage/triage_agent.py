@@ -96,6 +96,11 @@ KB Context Snippet:
                 "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}
             }
             res = requests.post(url, headers=headers, json=payload, timeout=10)
+            if res.status_code == 401:
+                # Try Bearer header for token-based keys
+                headers["Authorization"] = f"Bearer {gemini_key}"
+                url_no_key = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+                res = requests.post(url_no_key, headers=headers, json=payload, timeout=10)
             res.raise_for_status()
             res_json = res.json()
             text_out = res_json['candidates'][0]['content']['parts'][0]['text']
