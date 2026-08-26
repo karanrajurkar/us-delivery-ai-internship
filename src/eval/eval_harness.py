@@ -2,7 +2,7 @@ import json
 import os
 import time
 from typing import List, Dict, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.triage.triage_agent import TicketTriageAgent
 from src.summariser.account_summariser import TAMAccountSummariser
@@ -18,6 +18,7 @@ class TestCaseResult(BaseModel):
     quality_score: float
     reasoning: str
     latency_seconds: float
+    execution_mode: str = Field(default="RULE_ENGINE_FALLBACK")
     output_snippet: Dict[str, Any]
 
 class EvaluationHarness:
@@ -123,6 +124,7 @@ class EvaluationHarness:
                 quality_score=score,
                 reasoning=reasoning,
                 latency_seconds=round(latency, 4),
+                execution_mode=out_dict.get("execution_mode", "RULE_ENGINE_FALLBACK"),
                 output_snippet={
                     "product_area": out_dict["product_area"],
                     "urgency_tier": out_dict["urgency_tier"],
@@ -130,7 +132,8 @@ class EvaluationHarness:
                     "recommended_team": out_dict["recommended_team"]
                 }
             ))
-            print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) - {t['desc']}")
+            mode_tag = out_dict.get("execution_mode", "RULE_ENGINE_FALLBACK")
+            print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) [{mode_tag}] - {t['desc']}")
             time.sleep(1.5)
 
         return results
@@ -231,6 +234,7 @@ class EvaluationHarness:
                 quality_score=score,
                 reasoning=reasoning,
                 latency_seconds=round(latency, 4),
+                execution_mode=out_dict.get("execution_mode", "RULE_ENGINE_FALLBACK"),
                 output_snippet={
                     "account_id": out_dict["account_id"],
                     "company_name": out_dict["company_name"],
@@ -239,7 +243,8 @@ class EvaluationHarness:
                     "talking_points_count": len(t_points)
                 }
             ))
-            print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) - {t['desc']}")
+            mode_tag = out_dict.get("execution_mode", "RULE_ENGINE_FALLBACK")
+            print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) [{mode_tag}] - {t['desc']}")
             time.sleep(1.5)
 
         return results

@@ -26,6 +26,13 @@ def _throttle_gemini_summ_api():
         time.sleep(4.0 - elapsed)
     LAST_GEMINI_SUMM_CALL_TIME = time.time()
 
+def _redact_key(text: Any) -> str:
+    s = str(text)
+    s = re.sub(r'key=[A-Za-z0-9_\.-]+', 'key=***REDACTED***', s)
+    s = re.sub(r'sk-[A-Za-z0-9_\.-]+', 'sk-***REDACTED***', s)
+    s = re.sub(r'Bearer\s+[A-Za-z0-9_\.-]+', 'Bearer ***REDACTED***', s)
+    return s
+
 class AccountBrief(BaseModel):
     account_id: str
     company_name: str
@@ -79,7 +86,7 @@ class TAMAccountSummariser:
             try:
                 return self._summarise_with_llm(account, tickets_90d, risks)
             except Exception as e:
-                print(f"[TAMSummariser] LLM call failed: {e}. Falling back to deterministic rule engine.")
+                print(f"[TAMSummariser] LLM call failed: {_redact_key(e)}. Falling back to deterministic rule engine.")
 
         return self._summarise_rule_engine(account, tickets_90d, risks)
 
