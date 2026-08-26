@@ -265,7 +265,18 @@ Return valid JSON only matching the schema.
         res.raise_for_status()
         text_out = res.json().get("response", "")
         
-        parsed_raw = json.loads(text_out)
+        try:
+            parsed_raw = json.loads(text_out)
+        except Exception:
+            match = re.search(r'\{.*\}', text_out, re.DOTALL)
+            if match:
+                try:
+                    parsed_raw = json.loads(match.group(0))
+                except Exception:
+                    parsed_raw = {}
+            else:
+                parsed_raw = {}
+
         if isinstance(parsed_raw, list) and len(parsed_raw) > 0:
             parsed = parsed_raw[0]
         elif isinstance(parsed_raw, dict):
