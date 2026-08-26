@@ -11,7 +11,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0009,
+      "latency_seconds": 0.0074,
       "output_snippet": {
         "product_area": "Authentication",
         "urgency_tier": "P1",
@@ -27,7 +27,7 @@
       "passed": true,
       "quality_score": 0.8,
       "reasoning": "Expected urgency 'P1', got 'P2'",
-      "latency_seconds": 0.0004,
+      "latency_seconds": 0.0067,
       "output_snippet": {
         "product_area": "API Integration",
         "urgency_tier": "P2",
@@ -43,7 +43,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0,
+      "latency_seconds": 0.0035,
       "output_snippet": {
         "product_area": "Webhooks",
         "urgency_tier": "P3",
@@ -59,7 +59,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0,
+      "latency_seconds": 0.0044,
       "output_snippet": {
         "product_area": "Billing & Invoicing",
         "urgency_tier": "P4",
@@ -75,7 +75,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0,
+      "latency_seconds": 0.0046,
       "output_snippet": {
         "product_area": "Billing & Invoicing",
         "urgency_tier": "P2",
@@ -91,7 +91,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0045,
+      "latency_seconds": 0.001,
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
@@ -108,7 +108,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0,
+      "latency_seconds": 0.002,
       "output_snippet": {
         "account_id": "ACC-004",
         "company_name": "CyberShield Inc",
@@ -125,7 +125,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0,
+      "latency_seconds": 0.001,
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
@@ -142,7 +142,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0,
+      "latency_seconds": 0.001,
       "output_snippet": {
         "account_id": "ACC-005",
         "company_name": "DataDynamics",
