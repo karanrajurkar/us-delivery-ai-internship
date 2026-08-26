@@ -237,8 +237,8 @@ class TAMAccountSummariser:
         model_name = os.getenv("LOCAL_LLM_MODEL", "tinyllama").strip()
         
         t_summary = f"Total 90d Tickets: {len(tickets)}.\n"
-        for t in tickets[:10]:
-            t_summary += f"- [{t.get('ticket_id')}] ({t.get('product_area')}, {t.get('status')}): {t.get('subject')}\n  Body: {t.get('body')}\n"
+        for t in tickets[:5]:
+            t_summary += f"- [{t.get('ticket_id')}] ({t.get('product_area')}): {t.get('subject')} - {t.get('body', '')[:120]}\n"
 
         prompt = f"""{SUMMARISER_SYSTEM_PROMPT}
 
@@ -261,7 +261,7 @@ Return valid JSON only matching the schema.
             "stream": False,
             "format": "json"
         }
-        res = requests.post(local_url, json=payload, timeout=15)
+        res = requests.post(local_url, json=payload, timeout=60)
         res.raise_for_status()
         text_out = res.json().get("response", "")
         
@@ -286,11 +286,36 @@ Return valid JSON only matching the schema.
 
         if risks:
             parsed["open_risks_and_flagged_issues"] = [r.model_dump() for r in risks]
+        else:
+            raw_risks = parsed.get("open_risks_and_flagged_issues", [])
+            clean_risks = []
+            if isinstance(raw_risks, list):
+                for r in raw_risks:
+                    if isinstance(r, dict):
+                        clean_risks.append({
+                            "signal_type": str(r.get("signal_type", "escalation_signal")),
+                            "ticket_id": str(r.get("ticket_id", "NONE")),
+                            "justification_quote": str(r.get("justification_quote", "Risk flagged from ticket data."))
+                        })
+            parsed["open_risks_and_flagged_issues"] = clean_risks
+
+        raw_points = parsed.get("recommended_talking_points") or parsed.get("strategic_talking_points") or ["Review contract terms ahead of renewal", "Conduct technical check-in with TAM team"]
+        clean_points = []
+        if isinstance(raw_points, list):
+            for pt in raw_points:
+                if isinstance(pt, str):
+                    clean_points.append(pt)
+                elif isinstance(pt, dict):
+                    clean_points.append(str(pt.get("talking_point") or pt.get("justification_quote") or pt.get("signal_type") or str(pt)))
+                else:
+                    clean_points.append(str(pt))
+        else:
+            clean_points = [str(raw_points)]
 
         clean_dict = {
             "executive_summary": str(parsed.get("executive_summary", f"{account.get('company_name')} account health overview. Ticket volume monitored over 90 days.")),
             "open_risks_and_flagged_issues": parsed.get("open_risks_and_flagged_issues", []),
-            "recommended_talking_points": parsed.get("recommended_talking_points") or parsed.get("strategic_talking_points") or ["Review contract terms ahead of renewal", "Conduct technical check-in with TAM team"],
+            "recommended_talking_points": clean_points or ["Review contract terms ahead of renewal", "Conduct technical check-in with TAM team"],
             "execution_mode": f"LLM_LOCAL_OLLAMA ({model_name})"
         }
         return AccountBrief(
