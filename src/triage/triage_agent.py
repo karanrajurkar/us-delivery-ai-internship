@@ -107,17 +107,16 @@ KB Context Snippet:
                 "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}
             }
             res = None
-            for attempt in range(5):
+            for attempt in range(2):
                 _throttle_gemini_api()
-                res = requests.post(url, headers=headers, json=payload, timeout=30)
+                res = requests.post(url, headers=headers, json=payload, timeout=10)
+                if res.status_code in (400, 401, 403):
+                    # Non-retryable key/auth error - break immediately
+                    break
                 if res.status_code == 429:
-                    print(f"[TriageAgent] Rate limit 429 hit. Backing off for {5 * (attempt + 1)}s (Attempt {attempt+1}/5)...")
-                    time.sleep(5 * (attempt + 1))
+                    print(f"[TriageAgent] Rate limit 429 encountered. Retrying in 2s (Attempt {attempt+1}/2)...")
+                    time.sleep(2)
                     continue
-                if res.status_code == 401:
-                    headers["Authorization"] = f"Bearer {gemini_key}"
-                    url_no_key = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-                    res = requests.post(url_no_key, headers=headers, json=payload, timeout=30)
                 break
             res.raise_for_status()
             res_json = res.json()
