@@ -88,19 +88,19 @@ KB Context Snippet:
 """
 
         if gemini_key:
-            model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
+            model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
             headers = {"Content-Type": "application/json"}
             payload = {
                 "contents": [{"parts": [{"text": f"{TRIAGE_SYSTEM_PROMPT}\n\n{prompt}"}]}],
                 "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}
             }
-            res = requests.post(url, headers=headers, json=payload, timeout=10)
+            res = requests.post(url, headers=headers, json=payload, timeout=25)
             if res.status_code == 401:
                 # Try Bearer header for token-based keys
                 headers["Authorization"] = f"Bearer {gemini_key}"
                 url_no_key = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
-                res = requests.post(url_no_key, headers=headers, json=payload, timeout=10)
+                res = requests.post(url_no_key, headers=headers, json=payload, timeout=25)
             res.raise_for_status()
             res_json = res.json()
             text_out = res_json['candidates'][0]['content']['parts'][0]['text']
