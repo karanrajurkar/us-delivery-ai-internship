@@ -34,6 +34,83 @@ Production-grade, LLM-powered internal AI platform built for Technical Support (
 
 ---
 
+## 🏗️ System Architecture Diagram
+
+```mermaid
+flowchart TB
+    subgraph ClientLayer ["1. Client & Interface Layer"]
+        UI["🎨 Streamlit Web UI (ui_demo.py)"]
+        CLI["💻 CLI Runner (main.py)"]
+        API_Client["🌐 External REST Clients / cURL"]
+        CI_CD["🔄 GitHub Actions CI (.github/workflows/eval.yml)"]
+    end
+
+    subgraph ServiceLayer ["2. Service & API Layer (FastAPI)"]
+        APP["⚡ FastAPI App (src/api/app.py)"]
+        
+        subgraph CoreTasks ["Core AI Task Engine"]
+            T1["🎫 Task 1: Ticket Triage Agent\n(src/triage/triage_agent.py)"]
+            T2["📊 Task 2: TAM Account Summariser\n(src/summariser/account_summariser.py)"]
+            T3["🧪 Task 3: Evaluation Harness\n(src/eval/eval_harness.py)"]
+        end
+    end
+
+    subgraph EngineLayer ["3. Intelligence & Processing Layer"]
+        PII["🛡️ PII Redaction & Regex Scrubber"]
+        RAG["📚 RAG Vector Retriever\n(Cosine TF-IDF over Markdown KB)"]
+        QUOTE["🔥 Verbatim Quote Extractor\n(Regex Churn/Escalation Scanner)"]
+        LLM["🤖 External LLM API\n(Gemini 2.5 Flash / OpenAI GPT-4o-mini)"]
+        RULE["⚙️ Deterministic Rule Fallback Engine\n(100% Uptime Failover)"]
+    end
+
+    subgraph DataLayer ["4. Data & Storage Layer"]
+        LOADER["📂 Data Loader & 90-Day Filter\n(src/data/loader.py)"]
+        ACCOUNTS[("📁 Accounts CRM\ndata/accounts.json")]
+        TICKETS[("🎫 Tickets Store\ndata/tickets.json")]
+        KB_FILES[("📄 KB Documentation\ndata/kb/*.md")]
+        PROMPTS["📜 Tracked Versioned Prompts\n(prompts/triage_v1.py & summariser_v1.py)"]
+        REPORTS["📄 Eval Reports\n(eval_report.json & eval_report.md)"]
+    end
+
+    %% Client Layer Connections
+    UI --> T1
+    UI --> T2
+    UI --> T3
+    CLI --> T1
+    CLI --> T2
+    CLI --> T3
+    API_Client --> APP
+    CI_CD --> T3
+
+    %% Service Layer Routing
+    APP -->|"POST /api/v1/triage"| T1
+    APP -->|"POST /api/v1/summarise"| T2
+    APP -->|"POST /api/v1/triage/stream"| T1
+
+    %% Task 1 Execution Flow
+    T1 --> RAG
+    T1 --> PII
+    PII --> LLM
+    LLM -.->|API Failure / Timeout| RULE
+    T1 --> RULE
+
+    %% Task 2 Execution Flow
+    T2 --> LOADER
+    T2 --> QUOTE
+    T2 --> PII
+    QUOTE --> LLM
+
+    %% Data Layer Connections
+    RAG --> KB_FILES
+    LOADER --> ACCOUNTS
+    LOADER --> TICKETS
+    T1 --> PROMPTS
+    T2 --> PROMPTS
+    T3 --> REPORTS
+```
+
+---
+
 ## 🚀 Quickstart & Setup
 
 ### Option A: ⚡ 1-Click Automated Launcher (Easiest)

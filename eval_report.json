@@ -11,7 +11,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0,
+      "latency_seconds": 0.0009,
       "output_snippet": {
         "product_area": "Authentication",
         "urgency_tier": "P1",
@@ -27,7 +27,7 @@
       "passed": true,
       "quality_score": 0.8,
       "reasoning": "Expected urgency 'P1', got 'P2'",
-      "latency_seconds": 0.0,
+      "latency_seconds": 0.0004,
       "output_snippet": {
         "product_area": "API Integration",
         "urgency_tier": "P2",
@@ -75,7 +75,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.016,
+      "latency_seconds": 0.0,
       "output_snippet": {
         "product_area": "Billing & Invoicing",
         "urgency_tier": "P2",
@@ -91,12 +91,12 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0024,
+      "latency_seconds": 0.0045,
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 3,
+        "risk_flag_count": 8,
         "talking_points_count": 4
       }
     },
@@ -108,12 +108,12 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 0.0008,
+      "latency_seconds": 0.0,
       "output_snippet": {
         "account_id": "ACC-004",
         "company_name": "CyberShield Inc",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 6,
+        "risk_flag_count": 10,
         "talking_points_count": 4
       }
     },
@@ -130,7 +130,7 @@
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 3,
+        "risk_flag_count": 8,
         "talking_points_count": 4
       }
     },
@@ -147,7 +147,7 @@
         "account_id": "ACC-005",
         "company_name": "DataDynamics",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 8,
+        "risk_flag_count": 12,
         "talking_points_count": 4
       }
     },
