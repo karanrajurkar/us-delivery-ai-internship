@@ -84,7 +84,11 @@ class TicketTriageAgent:
             matched_kb, kb_score, kb_context = retrieved_docs[0]
 
         # Step 2: LLM API or Local Rule Engine Classification
-        if api_key and not api_key.startswith("your_") and not api_key.startswith("YOUR_"):
+        gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
+        openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+        has_valid_key = gemini_key.startswith("AIzaSy") or openai_key.startswith("sk-")
+
+        if has_valid_key:
             try:
                 return self._triage_with_llm(subject, body, matched_kb, kb_score, kb_context)
             except Exception as e:
@@ -94,8 +98,8 @@ class TicketTriageAgent:
 
     def _triage_with_llm(self, subject: str, body: str, matched_kb: str, kb_score: float, kb_context: str) -> TriageOutput:
         import requests
-        gemini_key = os.getenv("GEMINI_API_KEY")
-        openai_key = os.getenv("OPENAI_API_KEY")
+        gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
+        openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
         
         prompt = f"""Ticket Subject: {subject}
 Ticket Body: {body}
@@ -105,8 +109,8 @@ KB Context Snippet:
 {kb_context[:500]}
 """
 
-        if gemini_key:
-            model_name = os.getenv("GEMINI_MODEL", "gemini-3.6-flash").strip()
+        if gemini_key.startswith("AIzaSy"):
+            model_name = os.getenv("GEMINI_MODEL", "gemini-1.5-flash").strip()
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
             headers = {"Content-Type": "application/json"}
             payload = {
@@ -133,11 +137,11 @@ KB Context Snippet:
             parsed["kb_relevance_score"] = round(kb_score, 3)
             parsed["execution_mode"] = "LLM_GEMINI"
             return TriageOutput(**parsed)
-        elif openai_key:
+        elif openai_key.startswith("sk-"):
             url = "https://api.openai.com/v1/chat/completions"
             headers = {"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
             payload = {
-                "model": "gpt-4o-mini",
+                "model": os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
                 "messages": [
                     {"role": "system", "content": TRIAGE_SYSTEM_PROMPT},
                     {"role": "user", "content": prompt}

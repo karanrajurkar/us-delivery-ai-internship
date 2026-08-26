@@ -82,7 +82,11 @@ class TAMAccountSummariser:
         # Deterministic Risk & Churn Quote Extraction
         risks = self._extract_verbatim_risk_quotes(tickets_90d)
 
-        if api_key and not api_key.startswith("your_") and not api_key.startswith("YOUR_"):
+        gemini_key = (os.getenv("GEMINI_API_KEY") or "").strip()
+        openai_key = (os.getenv("OPENAI_API_KEY") or "").strip()
+        has_valid_key = gemini_key.startswith("AIzaSy") or openai_key.startswith("sk-")
+
+        if has_valid_key:
             try:
                 return self._summarise_with_llm(account, tickets_90d, risks)
             except Exception as e:
