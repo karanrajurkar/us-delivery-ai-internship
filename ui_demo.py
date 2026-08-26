@@ -2,6 +2,10 @@ import streamlit as st
 import json
 import time
 import pandas as pd
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
 from src.data.loader import DataLoader
 from src.triage.triage_agent import TicketTriageAgent, TriageInput
 from src.summariser.account_summariser import TAMAccountSummariser

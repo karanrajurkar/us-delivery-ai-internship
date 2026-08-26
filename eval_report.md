@@ -8,15 +8,15 @@
 
 | Task | Test ID | Description | Type | Result | Score | Latency (s) |
 |---|---|---|---|---|---|---|
-| Task 1: Ticket Triage | `T1_TEST_1` | Standard Authentication SSO lockout ticket | Standard | ✅ PASS | **1.0** | 0.0074s |
-| Task 1: Ticket Triage | `T1_TEST_2` | API Rate Limit 429 error during migration | Standard | ✅ PASS | **0.8** | 0.0067s |
-| Task 1: Ticket Triage | `T1_TEST_3` | Webhook HMAC signature verification failing | Standard | ✅ PASS | **1.0** | 0.0035s |
-| Task 1: Ticket Triage | `T1_TEST_4` | General payment portal query | Standard | ✅ PASS | **1.0** | 0.0044s |
-| Task 1: Ticket Triage | `T1_TEST_5_ADV` | Adversarial: Highly ambiguous multi-issue ticket (Billing dispute + Database outage) | Adversarial | ✅ PASS | **1.0** | 0.0046s |
-| Task 2: Account Health Summariser | `T2_TEST_1` | Account ACC-001 with high churn risk tickets | Standard | ✅ PASS | **1.0** | 0.001s |
-| Task 2: Account Health Summariser | `T2_TEST_2` | Pro tier account ACC-004 health summary check | Standard | ✅ PASS | **1.0** | 0.002s |
-| Task 2: Account Health Summariser | `T2_TEST_3` | Determinism verification: duplicate run check on ACC-001 | Standard | ✅ PASS | **1.0** | 0.001s |
-| Task 2: Account Health Summariser | `T2_TEST_4` | Enterprise tier account ACC-005 ticket history check | Standard | ✅ PASS | **1.0** | 0.001s |
+| Task 1: Ticket Triage | `T1_TEST_1` | Standard Authentication SSO lockout ticket | Standard | ✅ PASS | **1.0** | 0.0s |
+| Task 1: Ticket Triage | `T1_TEST_2` | API Rate Limit 429 error during migration | Standard | ✅ PASS | **0.8** | 0.0031s |
+| Task 1: Ticket Triage | `T1_TEST_3` | Webhook HMAC signature verification failing | Standard | ✅ PASS | **1.0** | 0.0s |
+| Task 1: Ticket Triage | `T1_TEST_4` | General payment portal query | Standard | ✅ PASS | **1.0** | 0.0s |
+| Task 1: Ticket Triage | `T1_TEST_5_ADV` | Adversarial: Highly ambiguous multi-issue ticket (Billing dispute + Database outage) | Adversarial | ✅ PASS | **1.0** | 0.0s |
+| Task 2: Account Health Summariser | `T2_TEST_1` | Account ACC-001 with high churn risk tickets | Standard | ✅ PASS | **1.0** | 0.0047s |
+| Task 2: Account Health Summariser | `T2_TEST_2` | Pro tier account ACC-004 health summary check | Standard | ✅ PASS | **1.0** | 0.0s |
+| Task 2: Account Health Summariser | `T2_TEST_3` | Determinism verification: duplicate run check on ACC-001 | Standard | ✅ PASS | **1.0** | 0.0s |
+| Task 2: Account Health Summariser | `T2_TEST_4` | Enterprise tier account ACC-005 ticket history check | Standard | ✅ PASS | **1.0** | 0.0007s |
 | Task 2: Account Health Summariser | `T2_TEST_5_ADV` | Adversarial: Non-existent account ID 'ACC-99999' | Adversarial | ✅ PASS | **0.85** | 0.0s |
 
 ## Detailed Test Logs
@@ -94,7 +94,7 @@
   "account_id": "ACC-001",
   "company_name": "Acme Corp",
   "exec_summary_sentences": 4,
-  "risk_flag_count": 8,
+  "risk_flag_count": 4,
   "talking_points_count": 4
 }
 ```
@@ -108,7 +108,7 @@
   "account_id": "ACC-004",
   "company_name": "CyberShield Inc",
   "exec_summary_sentences": 4,
-  "risk_flag_count": 10,
+  "risk_flag_count": 7,
   "talking_points_count": 4
 }
 ```
@@ -122,7 +122,7 @@
   "account_id": "ACC-001",
   "company_name": "Acme Corp",
   "exec_summary_sentences": 4,
-  "risk_flag_count": 8,
+  "risk_flag_count": 4,
   "talking_points_count": 4
 }
 ```
@@ -136,7 +136,7 @@
   "account_id": "ACC-005",
   "company_name": "DataDynamics",
   "exec_summary_sentences": 4,
-  "risk_flag_count": 12,
+  "risk_flag_count": 14,
   "talking_points_count": 4
 }
 ```

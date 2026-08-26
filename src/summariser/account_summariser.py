@@ -3,6 +3,9 @@ import json
 import re
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from src.data.loader import DataLoader
 from prompts.summariser_v1 import SUMMARISER_SYSTEM_PROMPT, SUMMARISER_PROMPT_VERSION
@@ -27,9 +30,11 @@ class AccountBrief(BaseModel):
 class TAMAccountSummariser:
     def __init__(self, loader: Optional[DataLoader] = None):
         self.loader = loader or DataLoader()
-        self.api_key = os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")
 
     def summarise_account(self, account_id: str) -> AccountBrief:
+        load_dotenv(override=True)
+        api_key = (os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
+
         account = self.loader.get_account_by_id(account_id)
         if not account:
             # Handle missing / non-existent account data (Adversarial test case support)
@@ -59,7 +64,7 @@ class TAMAccountSummariser:
         # Deterministic Risk & Churn Quote Extraction
         risks = self._extract_verbatim_risk_quotes(tickets_90d)
 
-        if self.api_key:
+        if api_key and not api_key.startswith("your_") and not api_key.startswith("YOUR_"):
             try:
                 return self._summarise_with_llm(account, tickets_90d, risks)
             except Exception as e:

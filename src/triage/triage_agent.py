@@ -3,6 +3,9 @@ import json
 import re
 from typing import Dict, Any, Optional, Union
 from pydantic import BaseModel, Field
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from src.triage.rag_retriever import KBRetriever
 from prompts.triage_v1 import TRIAGE_SYSTEM_PROMPT, TRIAGE_PROMPT_VERSION
@@ -27,9 +30,12 @@ class TriageOutput(BaseModel):
 class TicketTriageAgent:
     def __init__(self, retriever: Optional[KBRetriever] = None):
         self.retriever = retriever or KBRetriever()
-        self.api_key = os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY")
 
     def triage(self, ticket_input: Union[str, Dict[str, Any], TriageInput]) -> TriageOutput:
+        # Load environment dynamically
+        load_dotenv(override=True)
+        api_key = (os.getenv("GEMINI_API_KEY") or os.getenv("OPENAI_API_KEY") or "").strip()
+
         # Normalize input
         if isinstance(ticket_input, str):
             try:
@@ -60,11 +66,11 @@ class TicketTriageAgent:
             matched_kb, kb_score, kb_context = retrieved_docs[0]
 
         # Step 2: LLM API or Local Rule Engine Classification
-        if self.api_key:
+        if api_key and not api_key.startswith("your_") and not api_key.startswith("YOUR_"):
             try:
                 return self._triage_with_llm(subject, body, matched_kb, kb_score, kb_context)
             except Exception as e:
-                print(f"[TriageAgent] LLM API call failed: {e}. Falling back to rule engine.")
+                print(f"[TriageAgent] LLM API call failed with error: {e}. Falling back to rule engine.")
 
         return self._triage_rule_engine(subject, body, matched_kb, kb_score)
 
