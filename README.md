@@ -34,6 +34,25 @@ Production-grade, LLM-powered internal AI platform built for Technical Support (
 
 ---
 
+## 🛠️ Technology Stack & Infrastructure
+
+| Layer / Domain | Technology | Description & Usage |
+| :--- | :--- | :--- |
+| **Core Runtime** | **Python 3.10+** | Base runtime environment for all services and agents |
+| **Web UI Dashboard** | **Streamlit** | Interactive front-end web demo for TAMs and support agents ([`ui_demo.py`](ui_demo.py)) |
+| **REST API Framework** | **FastAPI** & **Uvicorn** | Asynchronous HTTP server and SSE streaming API ([`src/api/app.py`](src/api/app.py)) |
+| **Primary Cloud LLM** | **Google Gemini API** | `gemini-1.5-flash` / `gemini-2.5-flash` for ticket classification and QBR brief synthesis |
+| **Secondary Cloud LLM** | **OpenAI API** | `gpt-4o-mini` integration capability |
+| **Local Offline LLM** | **Ollama** (`tinyllama`) | Zero-cost, 100% offline local LLM inference fallback |
+| **High Availability SLA** | **Deterministic Rule Engine** | Custom failover engine guaranteeing 100% SLA uptime when external APIs fail |
+| **RAG & Vector Retrieval** | **Scikit-learn** (TF-IDF & Cosine) | Vector similarity retriever over Markdown Knowledge Base docs (`data/kb/*.md`) |
+| **Data Validation & Schemas**| **Pydantic v2** | Strict data validation, schema enforcement, and structured JSON parsing |
+| **PII & Data Protection** | **Python `re` Regex Scrubber** | Client-side zero-latency PII redaction (redacting tokens, secrets, API keys) |
+| **Automated CI/CD** | **GitHub Actions** | Automated evaluation harness pipeline executed on every commit ([`.github/workflows/eval.yml`](.github/workflows/eval.yml)) |
+| **Prompt Versioning** | **Modular Prompt System** | Versioned system prompts with changelog tracking ([`prompts/PROMPT_CHANGELOG.md`](prompts/PROMPT_CHANGELOG.md)) |
+
+---
+
 ## 🏗️ System Architecture Diagram
 
 ```mermaid

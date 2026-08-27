@@ -1,23 +1,23 @@
 {
   "total_test_cases": 10,
-  "passed_count": 10,
-  "avg_quality_score": 0.97,
+  "passed_count": 5,
+  "avg_quality_score": 0.76,
   "test_cases": [
     {
       "task_name": "Task 1: Ticket Triage",
       "test_id": "T1_TEST_1",
       "description": "Standard Authentication SSO lockout ticket",
       "is_adversarial": false,
-      "passed": true,
-      "quality_score": 1.0,
-      "reasoning": "All criteria satisfied.",
-      "latency_seconds": 9.2692,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "passed": false,
+      "quality_score": 0.7,
+      "reasoning": "Expected area 'Authentication', got 'Authentication | Billing & Invoicing | API Integration | Webhooks | Infra & Performance | Dashboard & UI'",
+      "latency_seconds": 7.2966,
+      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
       "output_snippet": {
-        "product_area": "Authentication",
+        "product_area": "Authentication | Billing & Invoicing | API Integration | Webhooks | Infra & Performance | Dashboard & UI",
         "urgency_tier": "P1",
         "matched_kb_doc": "auth.md",
-        "recommended_team": "Security Ops"
+        "recommended_team": "TAM Escalation"
       }
     },
     {
@@ -25,16 +25,16 @@
       "test_id": "T1_TEST_2",
       "description": "API Rate Limit 429 error during migration",
       "is_adversarial": false,
-      "passed": true,
-      "quality_score": 0.8,
-      "reasoning": "Expected urgency 'P1', got 'P2'",
-      "latency_seconds": 9.1485,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "passed": false,
+      "quality_score": 0.5,
+      "reasoning": "Expected area 'API Integration', got 'Authentication | Billing & Invocaing | API Integration | Webhooks | Infraestructure & Performance | Dasbord & UI'; Expected urgency 'P1', got 'P2'",
+      "latency_seconds": 3.2904,
+      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
       "output_snippet": {
-        "product_area": "API Integration",
+        "product_area": "Authentication | Billing & Invocaing | API Integration | Webhooks | Infraestructure & Performance | Dasbord & UI",
         "urgency_tier": "P2",
         "matched_kb_doc": "api.md",
-        "recommended_team": "Tier 2 Engineering"
+        "recommended_team": "Tier 1 Support | Tier 2 Engineering | Billing OpS | Security OpS | TAM Escalation"
       }
     },
     {
@@ -42,16 +42,16 @@
       "test_id": "T1_TEST_3",
       "description": "Webhook HMAC signature verification failing",
       "is_adversarial": false,
-      "passed": true,
-      "quality_score": 1.0,
-      "reasoning": "All criteria satisfied.",
-      "latency_seconds": 9.1757,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "passed": false,
+      "quality_score": 0.5,
+      "reasoning": "Expected area 'Webhooks', got 'Authentication | Billing & Invocing | API Integration | Webhooks | Infrastructure & Performance | Dashboard & UI'; Expected urgency 'P3', got 'P1'",
+      "latency_seconds": 2.7591,
+      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
       "output_snippet": {
-        "product_area": "Webhooks",
-        "urgency_tier": "P3",
+        "product_area": "Authentication | Billing & Invocing | API Integration | Webhooks | Infrastructure & Performance | Dashboard & UI",
+        "urgency_tier": "P1",
         "matched_kb_doc": "api.md",
-        "recommended_team": "Tier 1 Support"
+        "recommended_team": "TAM Escalation"
       }
     },
     {
@@ -59,16 +59,16 @@
       "test_id": "T1_TEST_4",
       "description": "General payment portal query",
       "is_adversarial": false,
-      "passed": true,
-      "quality_score": 1.0,
-      "reasoning": "All criteria satisfied.",
-      "latency_seconds": 9.5388,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "passed": false,
+      "quality_score": 0.5,
+      "reasoning": "Expected area 'Billing & Invoicing', got 'Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashrboard & UI'; Expected urgency 'P4', got 'P2'",
+      "latency_seconds": 3.4153,
+      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
       "output_snippet": {
-        "product_area": "Billing & Invoicing",
-        "urgency_tier": "P4",
+        "product_area": "Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashrboard & UI",
+        "urgency_tier": "P2",
         "matched_kb_doc": "billing.md",
-        "recommended_team": "Billing Ops"
+        "recommended_team": "Tier 1 Support | Tier 2 Engineering | Billing OpS|Security Ops|TAM Eskaletion"
       }
     },
     {
@@ -79,13 +79,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 9.1064,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "latency_seconds": 3.1581,
+      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
       "output_snippet": {
-        "product_area": "Billing & Invoicing",
-        "urgency_tier": "P2",
+        "product_area": "Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashboard & UI",
+        "urgency_tier": "P1",
         "matched_kb_doc": "infrastructure.md",
-        "recommended_team": "Billing Ops"
+        "recommended_team": "Tier 1 Support"
       }
     },
     {
@@ -93,17 +93,17 @@
       "test_id": "T2_TEST_1",
       "description": "Account ACC-001 with high churn risk tickets",
       "is_adversarial": false,
-      "passed": true,
-      "quality_score": 1.0,
-      "reasoning": "All criteria satisfied.",
-      "latency_seconds": 9.2493,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "passed": false,
+      "quality_score": 0.55,
+      "reasoning": "Exec summary sentence count is 1 (expected 3-5); Fewer than 2 recommended talking points produced",
+      "latency_seconds": 4.8485,
+      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
-        "exec_summary_sentences": 4,
-        "risk_flag_count": 9,
-        "talking_points_count": 4
+        "exec_summary_sentences": 1,
+        "risk_flag_count": 11,
+        "talking_points_count": 1
       }
     },
     {
@@ -114,13 +114,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 10.5101,
+      "latency_seconds": 62.0445,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-004",
         "company_name": "CyberShield Inc",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 8,
+        "risk_flag_count": 10,
         "talking_points_count": 4
       }
     },
@@ -132,13 +132,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 9.4797,
+      "latency_seconds": 62.0405,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 9,
+        "risk_flag_count": 11,
         "talking_points_count": 4
       }
     },
@@ -150,13 +150,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 9.3869,
+      "latency_seconds": 62.0371,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-005",
         "company_name": "DataDynamics",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 13,
+        "risk_flag_count": 16,
         "talking_points_count": 4
       }
     },
@@ -168,7 +168,7 @@
       "passed": true,
       "quality_score": 0.85,
       "reasoning": "Exec summary sentence count is 2 (expected 3-5)",
-      "latency_seconds": 0.002,
+      "latency_seconds": 0.0,
       "execution_mode": "RULE_ENGINE_FALLBACK",
       "output_snippet": {
         "account_id": "ACC-99999",
