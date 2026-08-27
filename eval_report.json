@@ -1,7 +1,7 @@
 {
   "total_test_cases": 10,
   "passed_count": 9,
-  "avg_quality_score": 0.88,
+  "avg_quality_score": 0.92,
   "test_cases": [
     {
       "task_name": "Task 1: Ticket Triage",
@@ -9,13 +9,13 @@
       "description": "Standard Authentication SSO lockout ticket",
       "is_adversarial": false,
       "passed": true,
-      "quality_score": 0.8,
-      "reasoning": "Expected urgency 'P1', got 'P2'",
-      "latency_seconds": 11.8356,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 13.2549,
       "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "product_area": "Authentication",
-        "urgency_tier": "P2",
+        "urgency_tier": "P1",
         "matched_kb_doc": "auth.md",
         "recommended_team": "Security Ops"
       }
@@ -28,7 +28,7 @@
       "passed": true,
       "quality_score": 0.8,
       "reasoning": "Expected urgency 'P1', got 'P2'",
-      "latency_seconds": 11.0276,
+      "latency_seconds": 11.3751,
       "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "product_area": "API Integration",
@@ -42,16 +42,16 @@
       "test_id": "T1_TEST_3",
       "description": "Webhook HMAC signature verification failing",
       "is_adversarial": false,
-      "passed": false,
-      "quality_score": 0.5,
-      "reasoning": "Expected area 'Webhooks', got 'Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashrboard & UI'; Expected urgency 'P3', got 'P2'",
-      "latency_seconds": 67.9735,
-      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama) [Fallback: Gemini API Error (503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=***REDACTED***)]",
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 43.8698,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
-        "product_area": "Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashrboard & UI",
-        "urgency_tier": "P2",
+        "product_area": "Webhooks",
+        "urgency_tier": "P3",
         "matched_kb_doc": "api.md",
-        "recommended_team": "Tier 1 Support | Tier 2 Engineering | Billing OpS | Security OpS | TAM EscrAmIcALoCy"
+        "recommended_team": "Tier 2 Engineering"
       }
     },
     {
@@ -62,7 +62,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 25.9539,
+      "latency_seconds": 6.3314,
       "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "product_area": "Billing & Invoicing",
@@ -79,7 +79,7 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 8.9454,
+      "latency_seconds": 9.0453,
       "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "product_area": "Infrastructure & Performance",
@@ -96,13 +96,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 10.3034,
+      "latency_seconds": 14.8728,
       "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
-        "exec_summary_sentences": 5,
-        "risk_flag_count": 10,
+        "exec_summary_sentences": 4,
+        "risk_flag_count": 13,
         "talking_points_count": 3
       }
     },
@@ -114,13 +114,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 11.4266,
+      "latency_seconds": 11.8447,
       "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "account_id": "ACC-004",
         "company_name": "CyberShield Inc",
         "exec_summary_sentences": 4,
-        "risk_flag_count": 10,
+        "risk_flag_count": 9,
         "talking_points_count": 3
       }
     },
@@ -129,16 +129,16 @@
       "test_id": "T2_TEST_3",
       "description": "Determinism verification: duplicate run check on ACC-001",
       "is_adversarial": false,
-      "passed": true,
-      "quality_score": 1.0,
-      "reasoning": "All criteria satisfied.",
-      "latency_seconds": 14.8345,
+      "passed": false,
+      "quality_score": 0.6,
+      "reasoning": "Determinism failure: Executive summary differed on identical input",
+      "latency_seconds": 15.3201,
       "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
-        "exec_summary_sentences": 5,
-        "risk_flag_count": 10,
+        "exec_summary_sentences": 4,
+        "risk_flag_count": 13,
         "talking_points_count": 3
       }
     },
@@ -148,16 +148,16 @@
       "description": "Enterprise tier account ACC-005 ticket history check",
       "is_adversarial": false,
       "passed": true,
-      "quality_score": 0.85,
-      "reasoning": "Exec summary sentence count is 1 (expected 3-5)",
-      "latency_seconds": 37.9493,
-      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama) [Fallback: Gemini API Error (429 Client Error: Too Many Requests for url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=***REDACTED***)]",
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 14.7688,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "account_id": "ACC-005",
         "company_name": "DataDynamics",
-        "exec_summary_sentences": 1,
-        "risk_flag_count": 10,
-        "talking_points_count": 2
+        "exec_summary_sentences": 4,
+        "risk_flag_count": 13,
+        "talking_points_count": 3
       }
     },
     {

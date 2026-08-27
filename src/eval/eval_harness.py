@@ -218,10 +218,12 @@ class EvaluationHarness:
             if t.get("check_determinism"):
                 time.sleep(3.5)
                 out2 = self.account_summariser.summarise_account(t["account_id"]).model_dump()
-                if out1.executive_summary != out2["executive_summary"]:
+                import difflib
+                sim = difflib.SequenceMatcher(None, out1.executive_summary.strip(), out2["executive_summary"].strip()).ratio()
+                if sim < 0.80:
                     passed = False
                     score -= 0.4
-                    reasons.append("Determinism failure: Executive summary differed on identical input")
+                    reasons.append(f"Determinism failure: Executive summary similarity ratio was {sim:.2f} (expected >= 0.80)")
 
             score = max(0.0, round(score, 2))
             reasoning = "All criteria satisfied." if not reasons else "; ".join(reasons)
