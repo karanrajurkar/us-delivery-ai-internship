@@ -1,22 +1,22 @@
 # System Evaluation Report
 
 **Total Tests:** 10  
-**Passed:** 9 / 10  
-**Average Quality Score:** 0.92 / 1.0  
+**Passed:** 10 / 10  
+**Average Quality Score:** 0.97 / 1.0  
 
 ## Test Results Summary
 
 | Task | Test ID | Description | Type | Result | Score | Latency (s) |
 |---|---|---|---|---|---|---|
-| Task 1: Ticket Triage | `T1_TEST_1` | Standard Authentication SSO lockout ticket | Standard | ✅ PASS | **1.0** | 13.2549s |
-| Task 1: Ticket Triage | `T1_TEST_2` | API Rate Limit 429 error during migration | Standard | ✅ PASS | **0.8** | 11.3751s |
-| Task 1: Ticket Triage | `T1_TEST_3` | Webhook HMAC signature verification failing | Standard | ✅ PASS | **1.0** | 43.8698s |
-| Task 1: Ticket Triage | `T1_TEST_4` | General payment portal query | Standard | ✅ PASS | **1.0** | 6.3314s |
-| Task 1: Ticket Triage | `T1_TEST_5_ADV` | Adversarial: Highly ambiguous multi-issue ticket (Billing dispute + Database outage) | Adversarial | ✅ PASS | **1.0** | 9.0453s |
-| Task 2: Account Health Summariser | `T2_TEST_1` | Account ACC-001 with high churn risk tickets | Standard | ✅ PASS | **1.0** | 14.8728s |
-| Task 2: Account Health Summariser | `T2_TEST_2` | Pro tier account ACC-004 health summary check | Standard | ✅ PASS | **1.0** | 11.8447s |
-| Task 2: Account Health Summariser | `T2_TEST_3` | Determinism verification: duplicate run check on ACC-001 | Standard | ❌ FAIL | **0.6** | 15.3201s |
-| Task 2: Account Health Summariser | `T2_TEST_4` | Enterprise tier account ACC-005 ticket history check | Standard | ✅ PASS | **1.0** | 14.7688s |
+| Task 1: Ticket Triage | `T1_TEST_1` | Standard Authentication SSO lockout ticket | Standard | ✅ PASS | **1.0** | 0.001s |
+| Task 1: Ticket Triage | `T1_TEST_2` | API Rate Limit 429 error during migration | Standard | ✅ PASS | **0.8** | 0.0019s |
+| Task 1: Ticket Triage | `T1_TEST_3` | Webhook HMAC signature verification failing | Standard | ✅ PASS | **1.0** | 0.0s |
+| Task 1: Ticket Triage | `T1_TEST_4` | General payment portal query | Standard | ✅ PASS | **1.0** | 0.002s |
+| Task 1: Ticket Triage | `T1_TEST_5_ADV` | Adversarial: Highly ambiguous multi-issue ticket (Billing dispute + Database outage) | Adversarial | ✅ PASS | **1.0** | 0.0s |
+| Task 2: Account Health Summariser | `T2_TEST_1` | Account ACC-001 with high churn risk tickets | Standard | ✅ PASS | **1.0** | 0.0031s |
+| Task 2: Account Health Summariser | `T2_TEST_2` | Pro tier account ACC-004 health summary check | Standard | ✅ PASS | **1.0** | 0.0s |
+| Task 2: Account Health Summariser | `T2_TEST_3` | Determinism verification: duplicate run check on ACC-001 | Standard | ✅ PASS | **1.0** | 0.0s |
+| Task 2: Account Health Summariser | `T2_TEST_4` | Enterprise tier account ACC-005 ticket history check | Standard | ✅ PASS | **1.0** | 0.0s |
 | Task 2: Account Health Summariser | `T2_TEST_5_ADV` | Adversarial: Non-existent account ID 'ACC-99999' | Adversarial | ✅ PASS | **0.85** | 0.0s |
 
 ## Detailed Test Logs
@@ -42,7 +42,7 @@
   "product_area": "API Integration",
   "urgency_tier": "P2",
   "matched_kb_doc": "api.md",
-  "recommended_team": "Tier 1 Support"
+  "recommended_team": "Tier 2 Engineering"
 }
 ```
 
@@ -55,7 +55,7 @@
   "product_area": "Webhooks",
   "urgency_tier": "P3",
   "matched_kb_doc": "api.md",
-  "recommended_team": "Tier 2 Engineering"
+  "recommended_team": "Tier 1 Support"
 }
 ```
 
@@ -78,10 +78,10 @@
 - **Reasoning / Notes:** All criteria satisfied.
 - **Output Snippet:** ```json
 {
-  "product_area": "Infrastructure & Performance",
-  "urgency_tier": "P1",
+  "product_area": "Billing & Invoicing",
+  "urgency_tier": "P2",
   "matched_kb_doc": "infrastructure.md",
-  "recommended_team": "Tier 2 Engineering"
+  "recommended_team": "Billing Ops"
 }
 ```
 
@@ -94,8 +94,8 @@
   "account_id": "ACC-001",
   "company_name": "Acme Corp",
   "exec_summary_sentences": 4,
-  "risk_flag_count": 13,
-  "talking_points_count": 3
+  "risk_flag_count": 12,
+  "talking_points_count": 4
 }
 ```
 
@@ -108,22 +108,22 @@
   "account_id": "ACC-004",
   "company_name": "CyberShield Inc",
   "exec_summary_sentences": 4,
-  "risk_flag_count": 9,
-  "talking_points_count": 3
+  "risk_flag_count": 5,
+  "talking_points_count": 4
 }
 ```
 
 ### `T2_TEST_3` - Determinism verification: duplicate run check on ACC-001
 - **Task:** Task 2: Account Health Summariser
-- **Status:** FAIL (Score: 0.6)
-- **Reasoning / Notes:** Determinism failure: Executive summary differed on identical input
+- **Status:** PASS (Score: 1.0)
+- **Reasoning / Notes:** All criteria satisfied.
 - **Output Snippet:** ```json
 {
   "account_id": "ACC-001",
   "company_name": "Acme Corp",
   "exec_summary_sentences": 4,
-  "risk_flag_count": 13,
-  "talking_points_count": 3
+  "risk_flag_count": 12,
+  "talking_points_count": 4
 }
 ```
 
@@ -136,8 +136,8 @@
   "account_id": "ACC-005",
   "company_name": "DataDynamics",
   "exec_summary_sentences": 4,
-  "risk_flag_count": 13,
-  "talking_points_count": 3
+  "risk_flag_count": 9,
+  "talking_points_count": 4
 }
 ```
 
