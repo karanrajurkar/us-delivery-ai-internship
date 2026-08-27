@@ -1,23 +1,23 @@
 {
   "total_test_cases": 10,
-  "passed_count": 5,
-  "avg_quality_score": 0.76,
+  "passed_count": 9,
+  "avg_quality_score": 0.88,
   "test_cases": [
     {
       "task_name": "Task 1: Ticket Triage",
       "test_id": "T1_TEST_1",
       "description": "Standard Authentication SSO lockout ticket",
       "is_adversarial": false,
-      "passed": false,
-      "quality_score": 0.7,
-      "reasoning": "Expected area 'Authentication', got 'Authentication | Billing & Invoicing | API Integration | Webhooks | Infra & Performance | Dashboard & UI'",
-      "latency_seconds": 7.2966,
-      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
+      "passed": true,
+      "quality_score": 0.8,
+      "reasoning": "Expected urgency 'P1', got 'P2'",
+      "latency_seconds": 11.8356,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
-        "product_area": "Authentication | Billing & Invoicing | API Integration | Webhooks | Infra & Performance | Dashboard & UI",
-        "urgency_tier": "P1",
+        "product_area": "Authentication",
+        "urgency_tier": "P2",
         "matched_kb_doc": "auth.md",
-        "recommended_team": "TAM Escalation"
+        "recommended_team": "Security Ops"
       }
     },
     {
@@ -25,16 +25,16 @@
       "test_id": "T1_TEST_2",
       "description": "API Rate Limit 429 error during migration",
       "is_adversarial": false,
-      "passed": false,
-      "quality_score": 0.5,
-      "reasoning": "Expected area 'API Integration', got 'Authentication | Billing & Invocaing | API Integration | Webhooks | Infraestructure & Performance | Dasbord & UI'; Expected urgency 'P1', got 'P2'",
-      "latency_seconds": 3.2904,
-      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
+      "passed": true,
+      "quality_score": 0.8,
+      "reasoning": "Expected urgency 'P1', got 'P2'",
+      "latency_seconds": 11.0276,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
-        "product_area": "Authentication | Billing & Invocaing | API Integration | Webhooks | Infraestructure & Performance | Dasbord & UI",
+        "product_area": "API Integration",
         "urgency_tier": "P2",
         "matched_kb_doc": "api.md",
-        "recommended_team": "Tier 1 Support | Tier 2 Engineering | Billing OpS | Security OpS | TAM Escalation"
+        "recommended_team": "Tier 1 Support"
       }
     },
     {
@@ -44,14 +44,14 @@
       "is_adversarial": false,
       "passed": false,
       "quality_score": 0.5,
-      "reasoning": "Expected area 'Webhooks', got 'Authentication | Billing & Invocing | API Integration | Webhooks | Infrastructure & Performance | Dashboard & UI'; Expected urgency 'P3', got 'P1'",
-      "latency_seconds": 2.7591,
-      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
+      "reasoning": "Expected area 'Webhooks', got 'Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashrboard & UI'; Expected urgency 'P3', got 'P2'",
+      "latency_seconds": 67.9735,
+      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama) [Fallback: Gemini API Error (503 Server Error: Service Unavailable for url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=***REDACTED***)]",
       "output_snippet": {
-        "product_area": "Authentication | Billing & Invocing | API Integration | Webhooks | Infrastructure & Performance | Dashboard & UI",
-        "urgency_tier": "P1",
+        "product_area": "Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashrboard & UI",
+        "urgency_tier": "P2",
         "matched_kb_doc": "api.md",
-        "recommended_team": "TAM Escalation"
+        "recommended_team": "Tier 1 Support | Tier 2 Engineering | Billing OpS | Security OpS | TAM EscrAmIcALoCy"
       }
     },
     {
@@ -59,16 +59,16 @@
       "test_id": "T1_TEST_4",
       "description": "General payment portal query",
       "is_adversarial": false,
-      "passed": false,
-      "quality_score": 0.5,
-      "reasoning": "Expected area 'Billing & Invoicing', got 'Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashrboard & UI'; Expected urgency 'P4', got 'P2'",
-      "latency_seconds": 3.4153,
-      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 25.9539,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
-        "product_area": "Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashrboard & UI",
-        "urgency_tier": "P2",
+        "product_area": "Billing & Invoicing",
+        "urgency_tier": "P4",
         "matched_kb_doc": "billing.md",
-        "recommended_team": "Tier 1 Support | Tier 2 Engineering | Billing OpS|Security Ops|TAM Eskaletion"
+        "recommended_team": "Billing Ops"
       }
     },
     {
@@ -79,13 +79,13 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 3.1581,
-      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
+      "latency_seconds": 8.9454,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
-        "product_area": "Authentication | Billing & Invoiicing | API Integration | Webhooks | Infrastructure & Performance | Dashboard & UI",
+        "product_area": "Infrastructure & Performance",
         "urgency_tier": "P1",
         "matched_kb_doc": "infrastructure.md",
-        "recommended_team": "Tier 1 Support"
+        "recommended_team": "Tier 2 Engineering"
       }
     },
     {
@@ -93,17 +93,17 @@
       "test_id": "T2_TEST_1",
       "description": "Account ACC-001 with high churn risk tickets",
       "is_adversarial": false,
-      "passed": false,
-      "quality_score": 0.55,
-      "reasoning": "Exec summary sentence count is 1 (expected 3-5); Fewer than 2 recommended talking points produced",
-      "latency_seconds": 4.8485,
-      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama)",
+      "passed": true,
+      "quality_score": 1.0,
+      "reasoning": "All criteria satisfied.",
+      "latency_seconds": 10.3034,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
-        "exec_summary_sentences": 1,
-        "risk_flag_count": 11,
-        "talking_points_count": 1
+        "exec_summary_sentences": 5,
+        "risk_flag_count": 10,
+        "talking_points_count": 3
       }
     },
     {
@@ -114,14 +114,14 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 62.0445,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "latency_seconds": 11.4266,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "account_id": "ACC-004",
         "company_name": "CyberShield Inc",
         "exec_summary_sentences": 4,
         "risk_flag_count": 10,
-        "talking_points_count": 4
+        "talking_points_count": 3
       }
     },
     {
@@ -132,14 +132,14 @@
       "passed": true,
       "quality_score": 1.0,
       "reasoning": "All criteria satisfied.",
-      "latency_seconds": 62.0405,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "latency_seconds": 14.8345,
+      "execution_mode": "LLM_GEMINI",
       "output_snippet": {
         "account_id": "ACC-001",
         "company_name": "Acme Corp",
-        "exec_summary_sentences": 4,
-        "risk_flag_count": 11,
-        "talking_points_count": 4
+        "exec_summary_sentences": 5,
+        "risk_flag_count": 10,
+        "talking_points_count": 3
       }
     },
     {
@@ -148,16 +148,16 @@
       "description": "Enterprise tier account ACC-005 ticket history check",
       "is_adversarial": false,
       "passed": true,
-      "quality_score": 1.0,
-      "reasoning": "All criteria satisfied.",
-      "latency_seconds": 62.0371,
-      "execution_mode": "RULE_ENGINE_FALLBACK",
+      "quality_score": 0.85,
+      "reasoning": "Exec summary sentence count is 1 (expected 3-5)",
+      "latency_seconds": 37.9493,
+      "execution_mode": "LLM_LOCAL_OLLAMA (tinyllama) [Fallback: Gemini API Error (429 Client Error: Too Many Requests for url: https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=***REDACTED***)]",
       "output_snippet": {
         "account_id": "ACC-005",
         "company_name": "DataDynamics",
-        "exec_summary_sentences": 4,
-        "risk_flag_count": 16,
-        "talking_points_count": 4
+        "exec_summary_sentences": 1,
+        "risk_flag_count": 10,
+        "talking_points_count": 2
       }
     },
     {
