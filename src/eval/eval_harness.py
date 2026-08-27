@@ -134,8 +134,7 @@ class EvaluationHarness:
             ))
             mode_tag = out_dict.get("execution_mode", "RULE_ENGINE_FALLBACK")
             print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) [{mode_tag}] - {t['desc']}")
-            if "LLM_GEMINI" in mode_tag:
-                time.sleep(4.2)
+            time.sleep(3.5)
 
         return results
 
@@ -217,6 +216,7 @@ class EvaluationHarness:
 
             # Determinism test
             if t.get("check_determinism"):
+                time.sleep(3.5)
                 out2 = self.account_summariser.summarise_account(t["account_id"]).model_dump()
                 if out1.executive_summary != out2["executive_summary"]:
                     passed = False
@@ -246,8 +246,7 @@ class EvaluationHarness:
             ))
             mode_tag = out_dict.get("execution_mode", "RULE_ENGINE_FALLBACK")
             print(f"[{t['id']}] {'PASS' if passed else 'FAIL'} (Score: {score}) [{mode_tag}] - {t['desc']}")
-            if "LLM_GEMINI" in mode_tag:
-                time.sleep(4.2)
+            time.sleep(3.5)
 
         return results
 
