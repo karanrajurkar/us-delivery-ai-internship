@@ -175,15 +175,20 @@ class TicketTriageAgent:
             "generationConfig": {"temperature": 0.1, "responseMimeType": "application/json"}
         }
         res = None
-        for attempt in range(2):
+        for attempt in range(4):
             _throttle_gemini_api()
-            res = requests.post(url, headers=headers, json=payload, timeout=30)
-            if res.status_code in (400, 401, 403):
+            try:
+                res = requests.post(url, headers=headers, json=payload, timeout=30)
+                if res.status_code in (400, 401, 403):
+                    break
+                if res.status_code in (429, 500, 502, 503, 504):
+                    time.sleep(2.5 * (attempt + 1))
+                    continue
                 break
-            if res.status_code == 429:
-                time.sleep(2)
-                continue
-            break
+            except requests.exceptions.RequestException:
+                if attempt == 3:
+                    raise
+                time.sleep(2.5 * (attempt + 1))
         res.raise_for_status()
         text_out = res.json()['candidates'][0]['content']['parts'][0]['text']
         parsed = json.loads(text_out)
