@@ -182,13 +182,13 @@ class TicketTriageAgent:
                 if res.status_code in (400, 401, 403):
                     break
                 if res.status_code in (429, 500, 502, 503, 504):
-                    time.sleep(2.5 * (attempt + 1))
+                    time.sleep(5.0 * (attempt + 1))
                     continue
                 break
             except requests.exceptions.RequestException:
                 if attempt == 3:
                     raise
-                time.sleep(2.5 * (attempt + 1))
+                time.sleep(5.0 * (attempt + 1))
         res.raise_for_status()
         text_out = res.json()['candidates'][0]['content']['parts'][0]['text']
         parsed = json.loads(text_out)
